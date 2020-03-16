@@ -5,6 +5,8 @@ create tables
 Create database
 Plan / Create architecture
 	Database
+		extra things:
+			Some kind of status over volumes that had to be destroyed and such.
 	Backend
 		MVC
 	Frontend
