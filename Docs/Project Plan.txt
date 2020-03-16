@@ -1,0 +1,41 @@
+Coding project:
+
+create tables
+	normalise tables
+Create database
+Plan / Create architecture
+	Database
+	Backend
+		MVC
+	Frontend
+		MVVM
+		Users:
+			Sign-up.
+		Librarians:
+			Catalog lookup thing
+figure out Entity Framework
+	Code first or Tables first.
+plan testing.
+
+Minimum Viable Product:
+	Database general usability
+		Members, books, catalog and borrowing activity
+	statistics
+	API
+	A comparison between NoSQL & SQl, with a investigation and recommendation into how and why they should / should not use NoSQL. 
+		Clear and precise arguments
+			These can include benchmarks, scalability, vertical / horizontal scaling and future-proofing.
+
+
+
+Report:
+General layout
+	Title - use title
+	Heading - heading 1
+	Sub heading - heading 2
+	paragraph - heading 3
+Problem statement?
+determine what we are writing it in - latex / gdrive / word?
+	writing it in Word with Mandelay.
+Trello board?
+	Likely need something for Report and something for Coding
