@@ -1,3 +1,4 @@
+using GTL_Server;
 using NUnit.Framework;
 
 namespace GeorgiaTech
@@ -12,7 +13,9 @@ namespace GeorgiaTech
         [Test]
         public void Test1()
         {
-            Assert.Pass();
+            Program testObject = new Program();
+            var result = testObject.TestThisMethod();
+            Assert.AreEqual("Test string", result);
         }
     }
 }
