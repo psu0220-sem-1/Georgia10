@@ -1,2 +1,7 @@
 The staff can be professors as well, as it is called Georgia Tech Library, implying the library is a part of the educational facility.
     Due to this, a choice was made to switch the relationship between memeber and staff to an "o" for overlap, as they can be both.
+
+The logic with keeping ID's everywhere: it solves all our problems of getting the specific tuple.
+The logic with not keeping ID's everywhere: it does not relate to the date. 
+
+adresses: Product Owner has decided we keep the project scoped to only the state of Georgia.
