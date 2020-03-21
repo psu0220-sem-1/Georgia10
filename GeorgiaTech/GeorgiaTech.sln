@@ -3,11 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTL-Test", "GTL-Test\GTL-Test.csproj", "{8D06DD20-2A76-4085-BFFF-86F891A58F1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GTL-Test", "GTL-Test\GTL-Test.csproj", "{8D06DD20-2A76-4085-BFFF-86F891A58F1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTL-Server", "GTL-Server\GTL-Server.csproj", "{B6B6A772-EB92-4778-A01A-15582568ED59}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GTL-Server", "GTL-Server\GTL-Server.csproj", "{B6B6A772-EB92-4778-A01A-15582568ED59}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTL-API", "GTL-API\GTL-API.csproj", "{6C28EC51-9E80-4483-9084-1C20237FAFB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GTL-API", "GTL-API\GTL-API.csproj", "{6C28EC51-9E80-4483-9084-1C20237FAFB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTL-Web", "GTL-Web\GTL-Web.csproj", "{E88921F3-C7A3-4A59-9EE0-DF1DF276148B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTL-DataAccessLibrary", "GTL-DataAccessLibrary\GTL-DataAccessLibrary.csproj", "{7309E91B-3FC3-4885-AEE0-BCCE95AB8819}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +31,14 @@ Global
 		{6C28EC51-9E80-4483-9084-1C20237FAFB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C28EC51-9E80-4483-9084-1C20237FAFB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C28EC51-9E80-4483-9084-1C20237FAFB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E88921F3-C7A3-4A59-9EE0-DF1DF276148B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E88921F3-C7A3-4A59-9EE0-DF1DF276148B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E88921F3-C7A3-4A59-9EE0-DF1DF276148B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E88921F3-C7A3-4A59-9EE0-DF1DF276148B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7309E91B-3FC3-4885-AEE0-BCCE95AB8819}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7309E91B-3FC3-4885-AEE0-BCCE95AB8819}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7309E91B-3FC3-4885-AEE0-BCCE95AB8819}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7309E91B-3FC3-4885-AEE0-BCCE95AB8819}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
