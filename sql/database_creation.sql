@@ -32,8 +32,9 @@ create table members (
 
 create table member_types (
   member_id int not null,
-  type varchar(9) not null check (type in("student", "staff", "professor")),
-
+  type varchar(9) not null check (type in('student', 'staff', 'professor')),                                      
+  primary key (member_id, type),
+                                          
   constraint FK_type_member_id foreign key (member_id)
     references members (member_id)
     on update cascade on delete cascade
@@ -42,7 +43,8 @@ create table member_types (
 create table phone_numbers (
   member_id int not null,
   phone_number varchar(20) not null,
-
+  primary key (member_id, phone_number),
+  
   constraint FK_phone_number_member_id foreign key (member_id)
     references members (member_id)
     on update cascade on delete cascade
@@ -51,7 +53,8 @@ create table phone_numbers (
 create table cards (
   member_id int not null,
   photo_path varchar(50) not null,
-
+  primary key (member_id, photo_path),
+  
   constraint FK_card_member_id foreign key (member_id)
     references members (member_id)
     on update cascade on delete cascade
@@ -60,8 +63,8 @@ create table cards (
 create table staff (
   member_id int not null,
   job_title varchar(50) not null,
-
-
+  primary key (member_id, job_title),
+  
   constraint FK_staff_member_id foreign key (member_id)
     references members (member_id)
     on update cascade on delete cascade
@@ -79,14 +82,15 @@ create table materials (
   title varchar(100) not null,
   language varchar(50) not null,
   lendable bit not null,
+  type varchar(14) not null check (type in ('reference book', 'maps', 'rare book', 'book')),
   description varchar(max) not null,
-  type varchar(14) not null check (type in ("reference book", "maps", "rare book", "book")),
 );
 
 create table material_subjects (
   material_id int not null,
   subject varchar(50) not null,
-
+  primary key (material_id, subject),
+  
   constraint FK_subject_material_id foreign key (material_id)
     references materials (material_id)
     on update cascade on delete cascade
@@ -95,7 +99,8 @@ create table material_subjects (
 create table material_authors (
   material_id int not null,
   author_id int not null,
-
+  primary key (material_id, author_id),
+  
   constraint FK_material_authors_material_id foreign key (material_id)
     references materials (material_id)
     on update cascade on delete cascade,
@@ -109,7 +114,7 @@ create table volumes (
   material_id int not null,
   home_location_id int not null,
   current_location_id int not null,
-
+  
   constraint FK_volume_material_id foreign key (material_id)
     references materials (material_id)
     on update no action on delete no action,
@@ -129,7 +134,7 @@ create table loans (
   due_date date not null,
   extensions int not null,
   returned_date date,
-
+  
   constraint FK_loan_member_id foreign key (member_id)
     references members (member_id)
     on update no action on delete no action,
@@ -139,9 +144,9 @@ create table loans (
 );
 
 create table acquire (
-  material_id int not null,
+  material_id int not null primary key,
   additional_info varchar(100) not null,
-  reason_for_acquiring varchar(11) not null check (reason_for_acquiring in ("rare", "destroyed", "lost", "unspecified")),
+  reason_for_acquiring varchar(11) not null check (reason_for_acquiring in ('rare', 'destroyed', 'lost', 'unspecified')),
 
   constraint FK_acquire_material_id foreign key (material_id)
     references materials (material_id)
