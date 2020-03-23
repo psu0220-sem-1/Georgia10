@@ -98,7 +98,12 @@ CREATE TABLE [Author] (
     PRIMARY KEY ([author_id])
 );
 
+CREATE TABLE [Material_Type] (
+    [type_id] INT not null IDENTITY,
+    [type] VARCHAR(50) not null,
 
+    PRIMARY KEY ([type_id])
+);
 
 CREATE TABLE [Material] (
     [material_id] INT not null IDENTITY,
@@ -113,13 +118,6 @@ CREATE TABLE [Material] (
     CONSTRAINT [FK_material_type_id] FOREIGN KEY ([type_id])
         REFERENCES [Material_Type] ([type_id])
         ON UPDATE CASCADE
-);
-
-CREATE TABLE [Material_Type] (
-    [type_id] INT not null IDENTITY,
-    [type] VARCHAR(50) not null,
-
-    PRIMARY KEY ([type_id])
 );
 
 CREATE TABLE [Material_Subject] (
