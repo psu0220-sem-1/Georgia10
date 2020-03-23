@@ -29,11 +29,11 @@ CREATE TABLE [Member] (
 
     PRIMARY KEY ([member_id]),
     CONSTRAINT [FK_member_home_address_id] FOREIGN KEY ([home_address_id])
-        REFERENCES [Address] (address_id)
-        ON UPDATE CASCADE,
+        REFERENCES [Address] (address_id),
+        -- ON UPDATE CASCADE,
     CONSTRAINT [FK_member_campus_address_id] FOREIGN KEY ([campus_address_id])
         REFERENCES [Address] ([address_id])
-        ON UPDATE CASCADE
+        -- ON UPDATE CASCADE
 );
 
 CREATE TABLE [Member_Type] (
