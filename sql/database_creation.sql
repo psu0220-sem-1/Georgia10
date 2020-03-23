@@ -197,7 +197,7 @@ CREATE TABLE [Loan] (
         ON UPDATE NO ACTION
 );
 
-CREATE TABLE [Aquire_Reason](
+CREATE TABLE [Acquire_Reason](
     [reason_id] INT not null IDENTITY,
     [reason] VARCHAR(42),
 
@@ -213,8 +213,8 @@ CREATE TABLE [Acquire] (
     CONSTRAINT [FK_acquire_material_id] FOREIGN KEY ([material_id])
         REFERENCES [Material] ([material_id])
         ON UPDATE CASCADE,
-    CONSTRAINT [FK_aquire_reason_id] FOREIGN KEY ([reason_id])
-        REFERENCES [Aquire_Reason] (reason_id)
+    CONSTRAINT [FK_acquire_reason_id] FOREIGN KEY ([reason_id])
+        REFERENCES [Acquire_Reason] (reason_id)
         ON UPDATE CASCADE
 );
 
