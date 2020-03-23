@@ -123,14 +123,10 @@ CREATE TABLE [Material_Type] (
 );
 
 CREATE TABLE [Material_Subject] (
-    [material_id] INT not null,
+    [subject_id] INT not null IDENTITY,
     [subject] VARCHAR(50) not null,
 
-    PRIMARY KEY (material_id, [subject]),  
-    CONSTRAINT [FK_subject_material_id] FOREIGN KEY ([material_id])
-        REFERENCES [Material] (material_id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
+    PRIMARY KEY (subject_id),  
 );
 
 CREATE TABLE [Material_Subject_Assignment] (
