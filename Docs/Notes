@@ -5,3 +5,15 @@ The logic with keeping ID's everywhere: it solves all our problems of getting th
 The logic with not keeping ID's everywhere: it does not relate to the date. 
 
 adresses: Product Owner has decided we keep the project scoped to only the state of Georgia.
+
+.net Core vs .net standard: Multiplatform application ( Linux support was needed). 
+    Likewise with Entity Framework: Core was needed due to Multiplatform support.
+Database:
+    Enum workaround
+        Tables named [something]_Subject_Assignment are there to be mapping of an int to a standard value.
+        As SQL does not have enums, the _Subject_Assignment tables are made to solve this.
+        This also means searches are not done on a varchar, but rather on an int, speeding things up a lot.
+    To avoid deleting the parent from the child when the child has a reference is done by doing:
+        On delete no action.
+Business Layer:
+    MVP: Materials table and funcitonality first. 
