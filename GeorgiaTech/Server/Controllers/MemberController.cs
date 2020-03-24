@@ -5,7 +5,7 @@ using Server.Models;
 
 namespace Server.Controllers
 {
-    class MemberController : IGenerics<Member>
+    class MemberController : IMemberController
     {
         public void Create()
         {
