@@ -1,20 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Server.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Server.Controllers
 {
     public class VolumeController: IVolumeController
     {
-        private MemberController memberController;
-        public VolumeController()
+        private MaterialController materialController;
+        private AddressController addressController;
+        private readonly GTLContext _context;
+
+        public VolumeController(GTLContext context)
         {
-            memberController = new MemberController();
+            materialController = new MaterialController();
+            addressController = new AddressController();
+            _context = context;
+
         }
 
         public Volume Create(int materialID, int homeLocationID, int currentLocationID)
         {
-            throw new NotImplementedException();
+            var material = materialController.FindByID(materialID);
+            var homeLocation = addressController.FindByID(homeLocationID);
+            var currentLocation = addressController.FindByID(currentLocationID);
+
+            var volume = new Volume { Material = material, CurrentLocation = currentLocation, HomeLocation = homeLocation };
+
+            return volume;
         }
 
         public int Delete(Volume t)
@@ -24,7 +38,11 @@ namespace Server.Controllers
 
         public List<Volume> FindAll()
         {
-            throw new NotImplementedException();
+            IQueryable<Volume> volumes = _context.Volume
+                .Include(v => v.HomeLocation)
+                .Include(v => v.CurrentLocation);
+
+            return volumes.ToList();
         }
 
         public Volume FindByID(int ID)
@@ -37,9 +55,11 @@ namespace Server.Controllers
             throw new NotImplementedException();
         }
 
-        public Volume Insert(Volume t)
+        public Volume Insert(Volume volume)
         {
-            throw new NotImplementedException();
+            _context.Volume.Add(volume);
+            _context.SaveChanges();
+            return volume;
         }
 
         public Volume Update(Volume t)
