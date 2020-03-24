@@ -351,3 +351,6 @@ MigrationBackup/
 
 # Federlizer's personal
 .idea/
+
+# ignore appsettings
+appsettings.json
