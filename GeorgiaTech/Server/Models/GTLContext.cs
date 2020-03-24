@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Server.Models
 {
-    public partial class gtlContext : DbContext
+    public partial class GTLContext : DbContext
     {
-        public gtlContext()
+        public GTLContext()
         {
         }
 
-        public gtlContext(DbContextOptions<gtlContext> options)
+        public GTLContext(DbContextOptions<GTLContext> options)
             : base(options)
         {
         }
@@ -34,14 +34,15 @@ namespace Server.Models
         public virtual DbSet<Volume> Volume { get; set; }
         public virtual DbSet<ZipCode> ZipCode { get; set; }
 
+        /*
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 optionsBuilder.UseSqlServer("Data Source=localhost; Initial Catalog=gtl; user=sa; password=admin8789");
             }
         }
+        */
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
