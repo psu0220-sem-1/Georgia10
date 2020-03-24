@@ -39,8 +39,13 @@ namespace Server.Controllers
         public List<Volume> FindAll()
         {
             IQueryable<Volume> volumes = _context.Volume
+                .Include(v => v.Material)
+                    .ThenInclude(m => m.MaterialAuthor)
+                        .ThenInclude(ma => ma.Author)
                 .Include(v => v.HomeLocation)
-                .Include(v => v.CurrentLocation);
+                    .ThenInclude(a => a.ZipNavigation)
+                .Include(v => v.CurrentLocation)
+                    .ThenInclude(a => a.ZipNavigation);
 
             return volumes.ToList();
         }
