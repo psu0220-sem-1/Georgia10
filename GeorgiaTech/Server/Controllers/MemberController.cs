@@ -4,7 +4,7 @@ using System.Text;
 using Server.Models;
 namespace Server.Controllers
 {
-    class MemberController : IGenerics<Member>
+    class MemberController : IMemberController
     {
         IAddressController address;
         public void Create(string SSN, string fName, string lName, string homeAddress, string campusAddress)
