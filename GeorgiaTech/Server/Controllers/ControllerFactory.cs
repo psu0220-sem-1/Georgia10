@@ -3,7 +3,7 @@ using Server.Models;
 
 namespace Server.Controllers
 {
-    public static class ControllerFactorySingleton
+    public static class ControllerFactory
     {
         public static IAddressController CreateAddressController(GTLContext context)
         {
