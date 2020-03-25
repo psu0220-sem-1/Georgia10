@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Server.Controllers
 {
-    interface IMemberController
+    public interface IMemberController
     {
     }
 }
