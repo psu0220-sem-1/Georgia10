@@ -2,23 +2,19 @@
 using System.Collections.Generic;
 using System.Text;
 using Server.Models;
-
 namespace Server.Controllers
 {
     class MemberController : IGenerics<Member>
     {
-        public void Create()
-        {
-            //currently not being implemented, due to CreateMember existing. Will get removed.
-            throw new NotImplementedException();
-            //Take data for new Member. Add data to new member. Insert member into Database. 
-        }
-        public void CreateMember(string SSN, string fName, string lName, string homeAddress, string campusAddress)
+        IAddressController address;
+        public void Create(string SSN, string fName, string lName, string homeAddress, string campusAddress)
         {
             Member member = new Member();
             member.Ssn = SSN;
             member.FName = fName;
             member.LName = lName;
+            
+           
             //member.HomeAddress = homeAddress;
             //member.CampusAddress = campusAddress;
             //address requires Address controller to be done.
@@ -26,7 +22,6 @@ namespace Server.Controllers
             //member.MemberTypeAssignment
 
             throw new NotImplementedException();
-
         }
         
 
@@ -35,6 +30,26 @@ namespace Server.Controllers
             throw new NotImplementedException();
             /*Search for new Member. Find new Member. Delete new Member.
              */
+        }
+
+        public List<Member> FindAll()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Member FindByID(int ID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Member FindByType(Member t)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Member Insert(Member t)
+        {
+            throw new NotImplementedException();
         }
 
         public void Read(Member t)
@@ -47,6 +62,16 @@ namespace Server.Controllers
         {
             throw new NotImplementedException();
             //find chosen member. Update chosen member parameter. Update chosen member in database. 
+        }
+
+        int IController<Member>.Delete(Member t)
+        {
+            throw new NotImplementedException();
+        }
+
+        Member IController<Member>.Update(Member t)
+        {
+            throw new NotImplementedException();
         }
     }
 }
