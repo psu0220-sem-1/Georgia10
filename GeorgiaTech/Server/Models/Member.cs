@@ -8,8 +8,8 @@ namespace Server.Models
         {
             PhoneNumbers = new HashSet<PhoneNumber>();
             Memberships = new HashSet<Membership>();
+            Cards = new HashSet<Card>();
 
-            Card = new HashSet<Card>();
             Loan = new HashSet<Loan>();
             Staff = new HashSet<Staff>();
         }
@@ -25,8 +25,8 @@ namespace Server.Models
         public virtual Address CampusAddress { get; set; }
         public virtual Address HomeAddress { get; set; }
         public virtual ICollection<Membership> Memberships { get; set; }
+        public virtual ICollection<Card> Cards { get; set; }
 
-        public virtual ICollection<Card> Card { get; set; }
         public virtual ICollection<Loan> Loan { get; set; }
         public virtual ICollection<Staff> Staff { get; set; }
     }

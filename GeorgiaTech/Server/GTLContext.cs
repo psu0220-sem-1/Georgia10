@@ -134,19 +134,25 @@ namespace Server
 
             modelBuilder.Entity<Card>(entity =>
             {
-                entity.HasKey(e => new { e.MemberId, e.PhotoPath })
+                entity.ToTable("Card");
+
+                // key
+                entity.HasKey(card => new { card.MemberId, card.PhotoPath })
                     .HasName("PK__Card__52CBC9551B281D9F");
 
-                entity.Property(e => e.MemberId).HasColumnName("member_id");
+                // properties
+                entity.Property(card => card.MemberId)
+                    .HasColumnName("member_id");
 
-                entity.Property(e => e.PhotoPath)
+                entity.Property(card => card.PhotoPath)
                     .HasColumnName("photo_path")
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.Member)
-                    .WithMany(p => p.Card)
-                    .HasForeignKey(d => d.MemberId)
+                // relationships
+                entity.HasOne(card => card.Member)
+                    .WithMany(member => member.Cards)
+                    .HasForeignKey(card => card.MemberId)
                     .HasConstraintName("FK_card_member_id");
             });
 
@@ -356,6 +362,12 @@ namespace Server
                     .HasForeignKey(membership => membership.MemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_member_type_assignment_member_id");
+
+                entity.HasMany(member => member.Cards)
+                    .WithOne(card => card.Member)
+                    .HasForeignKey(card => card.MemberId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_card_member_id");
             });
 
             modelBuilder.Entity<MemberType>(entity =>
