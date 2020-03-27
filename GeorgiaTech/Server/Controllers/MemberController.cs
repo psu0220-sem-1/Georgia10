@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using System.Text;
 using Server.Models;
+using System.Linq;
 namespace Server.Controllers
 {
     class MemberController : IMemberController
     {
-        static GTLContext context;
-        IAddressController addressController = ControllerFactory.CreateAddressController(context);
+        static GTLContext db;
+        IAddressController addressController = ControllerFactory.CreateAddressController(db);
         
         public MemberController(GTLContext context)
         {
-            MemberController.context = context;
+            db = context;
         }
 
-        public void Create(string SSN, string fName, string lName, string homeAddress, string campusAddress, int zip, string homeAddressAdditionalInfo)
+        public void Create(string SSN, string fName, string lName, string homeAddress, string campusAddress, int zip, string homeAddressAdditionalInfo, List<MemberType> memberTypes)
         {
             Member member = new Member
             {
@@ -26,48 +27,56 @@ namespace Server.Controllers
                 //Campus address is set based on a pre-existing list. 
                 //this is set from the Card controller. Have set it to Null for now.
                 //TODO when interface is set up.
-                Card = null,
-                Loan = null
+                Cards = null,
+                Loans = null,
+                
             };
 
             throw new NotImplementedException();
         }
-       public Member setMemberType(Member member)
-        {
-            
-        }
-
-
         public void Delete(Member t)
         {
-            throw new NotImplementedException();
-            /*Search for new Member. Find new Member. Delete new Member.
-             */
+            //should just look in the db for the given member, removing it.
+            db.Members.Remove(t);
+            db.SaveChanges();
         }
-
+        public List<MemberType> GetMemberTypes()
+        {
+            //is used in the frontend to get a list of each membertype in the database, with its TypeID and TypeName.
+            return db.MemberTypes.ToList<MemberType>();
+        }
         public List<Member> FindAll()
         {
-            throw new NotImplementedException();
+            return db.Members.ToList<Member>();
         }
 
         public Member FindByID(int ID)
         {
-            throw new NotImplementedException();
+            
+            return db.Members.First(m => m.MemberId == ID);
         }
 
         public Member FindByType(Member t)
         {
+
+            //Dont see why this would ever be used - unless parameter is changed to Membership.
             throw new NotImplementedException();
+        }
+        public List<Member> FindAllByType(Membership t)
+        {
+            throw new NotImplementedException();
+
         }
 
         public Member Insert(Member t)
         {
             
-            context.Add(t);
-            context.SaveChanges();
-            //TODO
+            db.Add(t);
+            db.SaveChanges();
+            //currently having it throw new implementationexception, as it should return an int and not an object. 
             throw new NotImplementedException();
-            
+
+
         }
 
         public void Read(Member t)
