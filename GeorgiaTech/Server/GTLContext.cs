@@ -294,39 +294,51 @@ namespace Server.Models
 
             modelBuilder.Entity<Member>(entity =>
             {
-                entity.Property(e => e.MemberId).HasColumnName("member_id");
+                entity.ToTable("member");
 
-                entity.Property(e => e.CampusAddressId).HasColumnName("campus_address_id");
+                // key
+                entity.HasKey(member => member.MemberId);
 
-                entity.Property(e => e.FName)
-                    .IsRequired()
-                    .HasColumnName("f_name")
-                    .HasMaxLength(25)
-                    .IsUnicode(false);
 
-                entity.Property(e => e.HomeAddressId).HasColumnName("home_address_id");
+                // properties
+                entity.Property(member => member.MemberId)
+                    .HasColumnName("member_id");
 
-                entity.Property(e => e.LName)
-                    .IsRequired()
-                    .HasColumnName("l_name")
-                    .HasMaxLength(25)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Ssn)
+                entity.Property(member => member.Ssn)
                     .IsRequired()
                     .HasColumnName("ssn")
                     .HasMaxLength(10)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.CampusAddress)
+                entity.Property(member => member.FName)
+                    .IsRequired()
+                    .HasColumnName("f_name")
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(member => member.LName)
+                    .IsRequired()
+                    .HasColumnName("l_name")
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(member => member.CampusAddressId)
+                    .HasColumnName("campus_address_id");
+
+
+                entity.Property(member => member.HomeAddressId)
+                    .HasColumnName("home_address_id");
+
+                // relations
+                entity.HasOne(member => member.CampusAddress)
                     .WithMany(p => p.MemberCampusAddress)
-                    .HasForeignKey(d => d.CampusAddressId)
+                    .HasForeignKey(member => member.CampusAddressId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_member_campus_address_id");
 
-                entity.HasOne(d => d.HomeAddress)
+                entity.HasOne(member => member.HomeAddress)
                     .WithMany(p => p.MemberHomeAddress)
-                    .HasForeignKey(d => d.HomeAddressId)
+                    .HasForeignKey(member => member.HomeAddressId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_member_home_address_id");
             });
@@ -377,21 +389,25 @@ namespace Server.Models
 
             modelBuilder.Entity<PhoneNumber>(entity =>
             {
-                entity.HasKey(e => new { e.MemberId, e.PhoneNumber1 })
-                    .HasName("PK__Phone_Nu__0882B39245F31267");
-
                 entity.ToTable("Phone_Number");
 
-                entity.Property(e => e.MemberId).HasColumnName("member_id");
+                // key
+                entity.HasKey(phone => new { phone.MemberId, phone.Number })
+                    .HasName("PK__Phone_Nu__0882B39245F31267");
 
-                entity.Property(e => e.PhoneNumber1)
+                // properties
+                entity.Property(phone => phone.MemberId)
+                    .HasColumnName("member_id");
+
+                entity.Property(phone => phone.Number)
                     .HasColumnName("phone_number")
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.Member)
-                    .WithMany(p => p.PhoneNumber)
-                    .HasForeignKey(d => d.MemberId)
+                // relations
+                entity.HasOne(phone => phone.Member)
+                    .WithMany(member => member.PhoneNumbers)
+                    .HasForeignKey(phone => phone.MemberId)
                     .HasConstraintName("FK_phone_number_member_id");
             });
 
