@@ -6,14 +6,7 @@ namespace Server.Models
 {
     public partial class GTLContext : DbContext
     {
-        public GTLContext()
-        {
-        }
-
-        public GTLContext(DbContextOptions<GTLContext> options)
-            : base(options)
-        {
-        }
+        public GTLContext(DbContextOptions<GTLContext> options) : base(options) { }
 
         public virtual DbSet<Acquire> Acquire { get; set; }
         public virtual DbSet<AcquireReason> AcquireReason { get; set; }
@@ -33,16 +26,6 @@ namespace Server.Models
         public virtual DbSet<Staff> Staff { get; set; }
         public virtual DbSet<Volume> Volume { get; set; }
         public virtual DbSet<ZipCode> ZipCode { get; set; }
-
-        /*
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer("Data Source=localhost; Initial Catalog=gtl; user=sa; password=admin8789");
-            }
-        }
-        */
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -469,9 +452,6 @@ namespace Server.Models
                     .IsUnicode(false);
             });
 
-            OnModelCreatingPartial(modelBuilder);
         }
-
-        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }
