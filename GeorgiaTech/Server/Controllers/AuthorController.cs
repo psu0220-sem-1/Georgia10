@@ -8,12 +8,12 @@ namespace Server.Controllers
     public class AuthorController: IAuthorController
     {
         private readonly GTLContext _context;
-        
+
         public AuthorController(GTLContext context)
         {
             _context = context;
         }
-        
+
         /// <summary>
         /// Insert method will insert (i.e. save or persist) the author passed.
         /// </summary>
@@ -21,9 +21,9 @@ namespace Server.Controllers
         /// <returns>The same author object but with its ID</returns>
         public Author Insert(Author author)
         {
-            _context.Author.Add(author);
+            _context.Authors.Add(author);
             _context.SaveChanges();
-            
+
             return author;
         }
 
@@ -39,7 +39,7 @@ namespace Server.Controllers
 
         public List<Author> FindAll()
         {
-            return _context.Author.Where(a => true).ToList();
+            return _context.Authors.Where(a => true).ToList();
         }
 
         public Author Update(Author t)
@@ -54,7 +54,7 @@ namespace Server.Controllers
 
         /// <summary>
         /// Create method creates an Author object and returns it.
-        /// 
+        ///
         /// Note: The created author won't be saved to the DB, hence no ID will be assigned to the object.
         /// </summary>
         /// <param name="firstName">The first name of the author</param>
