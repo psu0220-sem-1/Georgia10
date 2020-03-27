@@ -15,9 +15,9 @@ namespace Server.Models
         public int CurrentLocationId { get; set; }
 
         public virtual Material Material { get; set; }
-
         public virtual Address CurrentLocation { get; set; }
         public virtual Address HomeLocation { get; set; }
+
         public virtual ICollection<Loan> Loan { get; set; }
     }
 }

@@ -117,18 +117,32 @@ namespace Server
                 entity.HasOne(address => address.Zip)
                     .WithMany()
                     .HasForeignKey(address => address.ZipCode)
-                    .OnDelete(DeleteBehavior.ClientNoAction)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_address_zip");
 
                 entity.HasMany<Member>()
                     .WithOne(member => member.HomeAddress)
                     .HasForeignKey(member => member.HomeAddressId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_member_home_address_id");
 
                 entity.HasMany<Member>()
                     .WithOne(member => member.CampusAddress)
                     .HasForeignKey(member => member.CampusAddressId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_member_campus_address_id");
+
+                entity.HasMany<Volume>()
+                    .WithOne(volume => volume.HomeLocation)
+                    .HasForeignKey(volume => volume.HomeLocationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_volume_home_location_id");
+
+                entity.HasMany<Volume>()
+                    .WithOne(volume => volume.CurrentLocation)
+                    .HasForeignKey(volume => volume.CurrentLocationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_volume_current_location_id");
             });
 
             modelBuilder.Entity<Author>(entity =>
