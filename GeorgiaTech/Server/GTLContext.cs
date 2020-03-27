@@ -7,24 +7,24 @@ namespace Server
     {
         public GTLContext(DbContextOptions<GTLContext> options) : base(options) { }
 
-        public virtual DbSet<Acquire> Acquire { get; set; }
-        public virtual DbSet<AcquireReason> AcquireReason { get; set; }
-        public virtual DbSet<Address> Address { get; set; }
-        public virtual DbSet<Author> Author { get; set; }
-        public virtual DbSet<Card> Card { get; set; }
-        public virtual DbSet<Loan> Loan { get; set; }
-        public virtual DbSet<Material> Material { get; set; }
-        public virtual DbSet<MaterialAuthor> MaterialAuthor { get; set; }
-        public virtual DbSet<MaterialSubject> MaterialSubject { get; set; }
-        public virtual DbSet<MaterialSubjects> MaterialSubjectAssignment { get; set; }
-        public virtual DbSet<MaterialType> MaterialType { get; set; }
-        public virtual DbSet<Member> Member { get; set; }
-        public virtual DbSet<MemberType> MemberType { get; set; }
-        public virtual DbSet<Membership> Membership { get; set; }
-        public virtual DbSet<PhoneNumber> PhoneNumber { get; set; }
+        public virtual DbSet<Acquire> Acquires { get; set; }
+        public virtual DbSet<AcquireReason> AcquireReasons { get; set; }
+        public virtual DbSet<Address> Addresses { get; set; }
+        public virtual DbSet<Author> Authors { get; set; }
+        public virtual DbSet<Card> Cards { get; set; }
+        public virtual DbSet<Loan> Loans { get; set; }
+        public virtual DbSet<Material> Materials { get; set; }
+        public virtual DbSet<MaterialAuthor> MaterialAuthors { get; set; }
+        public virtual DbSet<MaterialSubject> MaterialSubjects { get; set; }
+        public virtual DbSet<MaterialSubjects> MaterialSubjectAssignments { get; set; }
+        public virtual DbSet<MaterialType> MaterialTypes { get; set; }
+        public virtual DbSet<Member> Members { get; set; }
+        public virtual DbSet<MemberType> MemberTypes { get; set; }
+        public virtual DbSet<Membership> Memberships { get; set; }
+        public virtual DbSet<PhoneNumber> PhoneNumbers { get; set; }
         public virtual DbSet<Staff> Staff { get; set; }
-        public virtual DbSet<Volume> Volume { get; set; }
-        public virtual DbSet<ZipCode> ZipCode { get; set; }
+        public virtual DbSet<Volume> Volumes { get; set; }
+        public virtual DbSet<ZipCode> ZipCodes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
