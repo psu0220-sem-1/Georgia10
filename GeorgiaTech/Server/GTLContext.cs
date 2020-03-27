@@ -204,38 +204,48 @@ namespace Server
 
             modelBuilder.Entity<Material>(entity =>
             {
-                entity.Property(e => e.MaterialId).HasColumnName("material_id");
+                entity.ToTable("Material");
 
-                entity.Property(e => e.Description)
+                // key
+                entity.HasKey(material => material.MaterialId);
+
+                // properties
+                entity.Property(material => material.MaterialId)
+                    .HasColumnName("material_id");
+
+                entity.Property(material => material.Description)
                     .IsRequired()
                     .HasColumnName("description")
                     .IsUnicode(false);
 
-                entity.Property(e => e.Isbn)
+                entity.Property(material => material.Isbn)
                     .IsRequired()
                     .HasColumnName("isbn")
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Language)
+                entity.Property(material => material.Language)
                     .IsRequired()
                     .HasColumnName("language")
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Lendable).HasColumnName("lendable");
+                entity.Property(material => material.Lendable)
+                    .HasColumnName("lendable");
 
-                entity.Property(e => e.Title)
+                entity.Property(material => material.Title)
                     .IsRequired()
                     .HasColumnName("title")
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.TypeId).HasColumnName("type_id");
+                entity.Property(material => material.TypeId)
+                    .HasColumnName("type_id");
 
-                entity.HasOne(d => d.Type)
-                    .WithMany(p => p.Material)
-                    .HasForeignKey(d => d.TypeId)
+                // relationships
+                entity.HasOne(material => material.Type)
+                    .WithMany()
+                    .HasForeignKey(material => material.TypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_material_type_id");
             });
@@ -304,18 +314,28 @@ namespace Server
 
             modelBuilder.Entity<MaterialType>(entity =>
             {
-                entity.HasKey(e => e.TypeId)
-                    .HasName("PK__Material__2C000598CDAD1BE3");
-
                 entity.ToTable("Material_Type");
 
-                entity.Property(e => e.TypeId).HasColumnName("type_id");
+                // key
+                entity.HasKey(materialType => materialType.TypeId)
+                    .HasName("PK__Material__2C000598CDAD1BE3");
 
-                entity.Property(e => e.Type)
+                // properties
+                entity.Property(materialType => materialType.TypeId)
+                    .HasColumnName("type_id");
+
+                entity.Property(materialType => materialType.Type)
                     .IsRequired()
                     .HasColumnName("type")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                // relationships
+                entity.HasMany<Material>()
+                    .WithOne(material => material.Type)
+                    .HasForeignKey(material => material.TypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_material_type_id");
             });
 
             modelBuilder.Entity<Member>(entity =>

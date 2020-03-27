@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Server.Models
 {
@@ -21,6 +20,7 @@ namespace Server.Models
         public string Description { get; set; }
 
         public virtual MaterialType Type { get; set; }
+
         public virtual Acquire Acquire { get; set; }
         public virtual ICollection<MaterialAuthor> MaterialAuthor { get; set; }
         public virtual ICollection<MaterialSubjectAssignment> MaterialSubjectAssignment { get; set; }
