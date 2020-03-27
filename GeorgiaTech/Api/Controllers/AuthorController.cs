@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using Server;
 using Server.Controllers;
 using Server.Models;
 
@@ -10,7 +11,7 @@ namespace Api.Controllers
     public class AuthorController: ControllerBase
     {
         private readonly IAuthorController _controller;
-        
+
         public AuthorController(GTLContext context)
         {
             _controller = new Server.Controllers.AuthorController(context);
@@ -21,11 +22,11 @@ namespace Api.Controllers
         {
             var firstName = content.GetProperty("firstName").GetString();
             var lastName = content.GetProperty("lastName").GetString();
-            
+
 
             var author = _controller.Create(firstName, lastName);
             author = _controller.Insert(author);
-            
+
             return author;
         }
     }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Server.Models
 {
@@ -7,9 +6,9 @@ namespace Server.Models
     {
         public Material()
         {
-            MaterialAuthor = new HashSet<MaterialAuthor>();
-            MaterialSubjectAssignment = new HashSet<MaterialSubjectAssignment>();
-            Volume = new HashSet<Volume>();
+            MaterialSubjects = new HashSet<MaterialSubjects>();
+            MaterialAuthors = new HashSet<MaterialAuthor>();
+            Volumes = new HashSet<Volume>();
         }
 
         public int MaterialId { get; set; }
@@ -21,9 +20,9 @@ namespace Server.Models
         public string Description { get; set; }
 
         public virtual MaterialType Type { get; set; }
+        public virtual ICollection<MaterialSubjects> MaterialSubjects { get; set; }
+        public virtual ICollection<MaterialAuthor> MaterialAuthors { get; set; }
         public virtual Acquire Acquire { get; set; }
-        public virtual ICollection<MaterialAuthor> MaterialAuthor { get; set; }
-        public virtual ICollection<MaterialSubjectAssignment> MaterialSubjectAssignment { get; set; }
-        public virtual ICollection<Volume> Volume { get; set; }
+        public virtual ICollection<Volume> Volumes { get; set; }
     }
 }
