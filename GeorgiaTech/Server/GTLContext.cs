@@ -117,19 +117,30 @@ namespace Server
 
             modelBuilder.Entity<Author>(entity =>
             {
-                entity.Property(e => e.AuthorId).HasColumnName("author_id");
+                // key
+                entity.HasKey(author => author.AuthorId);
 
-                entity.Property(e => e.FirstName)
+                // properties
+                entity.Property(author => author.AuthorId)
+                    .HasColumnName("author_id");
+
+                entity.Property(author => author.FirstName)
                     .IsRequired()
                     .HasColumnName("first_name")
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.LastName)
+                entity.Property(author => author.LastName)
                     .IsRequired()
                     .HasColumnName("last_name")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                // relationships
+                entity.HasMany(author => author.AuthorMaterials)
+                    .WithOne(materialAuthor => materialAuthor.Author)
+                    .HasForeignKey(materialAuthor => materialAuthor.AuthorId)
+                    .HasConstraintName("FK_material_authors_author_id");
             });
 
             modelBuilder.Entity<Card>(entity =>
@@ -254,28 +265,40 @@ namespace Server
                     .HasForeignKey(materialSubjects => materialSubjects.MaterialId)
                     .OnDelete(DeleteBehavior.ClientNoAction)
                     .HasConstraintName("FK_material_subject_assignment_material_id");
+
+                entity.HasMany(material => material.MaterialAuthors)
+                    .WithOne(materialAuthor => materialAuthor.Material)
+                    .HasForeignKey(materialAuthor => materialAuthor.MaterialId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_material_authors_material_id");
             });
 
             modelBuilder.Entity<MaterialAuthor>(entity =>
             {
-                entity.HasKey(e => new { e.MaterialId, e.AuthorId })
-                    .HasName("PK__Material__839B0B943E2277FF");
-
                 entity.ToTable("Material_Author");
 
-                entity.Property(e => e.MaterialId).HasColumnName("material_id");
+                // key
+                entity.HasKey(materialAuthor => new { materialAuthor.MaterialId, materialAuthor.AuthorId })
+                    .HasName("PK__Material__839B0B943E2277FF");
 
-                entity.Property(e => e.AuthorId).HasColumnName("author_id");
+                // properties
+                entity.Property(materialAuthor => materialAuthor.MaterialId)
+                    .HasColumnName("material_id");
 
-                entity.HasOne(d => d.Author)
-                    .WithMany(p => p.MaterialAuthor)
-                    .HasForeignKey(d => d.AuthorId)
+                entity.Property(materialAuthor => materialAuthor.AuthorId)
+                    .HasColumnName("author_id");
+
+                // relationships
+                entity.HasOne(materialAuthor => materialAuthor.Author)
+                    .WithMany(author => author.AuthorMaterials)
+                    .HasForeignKey(materialAuthor => materialAuthor.AuthorId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_material_authors_author_id");
 
-                entity.HasOne(d => d.Material)
-                    .WithMany(p => p.MaterialAuthor)
-                    .HasForeignKey(d => d.MaterialId)
+                entity.HasOne(materialAuthor => materialAuthor.Material)
+                    .WithMany(material => material.MaterialAuthors)
+                    .HasForeignKey(materialAuthor => materialAuthor.MaterialId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_material_authors_material_id");
             });
 
