@@ -6,28 +6,36 @@ namespace Server.Controllers
 {
     class MemberController : IMemberController
     {
-        static GTLContext _context;
-        IAddressController addressController = ControllerFactory.CreateAddressController(_context);
-
+        static GTLContext context;
+        IAddressController addressController = ControllerFactory.CreateAddressController(context);
+        
         public MemberController(GTLContext context)
         {
-            _context = context;
+            MemberController.context = context;
         }
-        
+
         public void Create(string SSN, string fName, string lName, string homeAddress, string campusAddress, int zip, string homeAddressAdditionalInfo)
         {
-            Member member = new Member();
-            member.Ssn = SSN;
-            member.FName = fName;
-            member.LName = lName;
-            //decide if this should be extrapolated into a specific method.
-            member.HomeAddress = addressController.Create(homeAddress, homeAddressAdditionalInfo, zip);
-            //Campus address is set based on a pre-existing list. 
-            //TODO
-            member.Card = null;            
+            Member member = new Member
+            {
+                Ssn = SSN,
+                FName = fName,
+                LName = lName,
+                //decide if this should be extrapolated into a specific method.
+                HomeAddress = addressController.Create(homeAddress, homeAddressAdditionalInfo, zip),
+                //Campus address is set based on a pre-existing list. 
+                //this is set from the Card controller. Have set it to Null for now.
+                //TODO when interface is set up.
+                Card = null,
+                Loan = null
+            };
+
             throw new NotImplementedException();
         }
-        
+       public Member setMemberType(Member member)
+        {
+            
+        }
 
 
         public void Delete(Member t)
@@ -54,7 +62,12 @@ namespace Server.Controllers
 
         public Member Insert(Member t)
         {
+            
+            context.Add(t);
+            context.SaveChanges();
+            //TODO
             throw new NotImplementedException();
+            
         }
 
         public void Read(Member t)
