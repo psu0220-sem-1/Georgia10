@@ -20,7 +20,7 @@ namespace Server
         public virtual DbSet<MaterialType> MaterialType { get; set; }
         public virtual DbSet<Member> Member { get; set; }
         public virtual DbSet<MemberType> MemberType { get; set; }
-        public virtual DbSet<MemberTypeAssignment> MemberTypeAssignment { get; set; }
+        public virtual DbSet<Membership> Membership { get; set; }
         public virtual DbSet<PhoneNumber> PhoneNumber { get; set; }
         public virtual DbSet<Staff> Staff { get; set; }
         public virtual DbSet<Volume> Volume { get; set; }
@@ -350,48 +350,69 @@ namespace Server
                     .HasForeignKey(member => member.HomeAddressId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_member_home_address_id");
+
+                entity.HasMany(member => member.Memberships)
+                    .WithOne(membership => membership.Member)
+                    .HasForeignKey(membership => membership.MemberId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_member_type_assignment_member_id");
             });
 
             modelBuilder.Entity<MemberType>(entity =>
             {
+                entity.ToTable("Member_Type");
+
+                // key
                 entity.HasKey(e => e.TypeId)
                     .HasName("PK__Member_T__2C0005984BECC0B7");
-
-                entity.ToTable("Member_Type");
 
                 entity.HasIndex(e => e.Type)
                     .HasName("UQ__Member_T__E3F852486B4A84B2")
                     .IsUnique();
 
-                entity.Property(e => e.TypeId).HasColumnName("type_id");
+                // properties
+                entity.Property(e => e.TypeId)
+                    .HasColumnName("type_id");
 
                 entity.Property(e => e.Type)
                     .IsRequired()
                     .HasColumnName("type")
                     .HasMaxLength(25)
                     .IsUnicode(false);
+
+                // relationships
+                entity.HasMany<Membership>()
+                    .WithOne(membership => membership.Type)
+                    .HasForeignKey(membership => membership.TypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_member_type_assignment_type_id");
             });
 
-            modelBuilder.Entity<MemberTypeAssignment>(entity =>
+            modelBuilder.Entity<Membership>(entity =>
             {
-                entity.HasKey(e => new { e.MemberId, e.TypeId })
-                    .HasName("PK__Member_T__205B856DB2C31985");
-
                 entity.ToTable("Member_Type_Assignment");
 
-                entity.Property(e => e.MemberId).HasColumnName("member_id");
+                // key
+                entity.HasKey(membership => new { membership.MemberId, membership.TypeId })
+                    .HasName("PK__Member_T__205B856DB2C31985");
 
-                entity.Property(e => e.TypeId).HasColumnName("type_id");
+                // properties
+                entity.Property(e => e.MemberId)
+                    .HasColumnName("member_id");
 
-                entity.HasOne(d => d.Member)
-                    .WithMany(p => p.MemberTypeAssignment)
-                    .HasForeignKey(d => d.MemberId)
+                entity.Property(e => e.TypeId)
+                    .HasColumnName("type_id");
+
+                // relationships
+                entity.HasOne(membership => membership.Member)
+                    .WithMany(member => member.Memberships)
+                    .HasForeignKey(membership => membership.MemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_member_type_assignment_member_id");
 
-                entity.HasOne(d => d.Type)
-                    .WithMany(p => p.MemberTypeAssignment)
-                    .HasForeignKey(d => d.TypeId)
+                entity.HasOne(membership => membership.Type)
+                    .WithMany()
+                    .HasForeignKey(membership => membership.TypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_member_type_assignment_type_id");
             });

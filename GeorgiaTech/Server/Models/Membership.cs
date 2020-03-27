@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Server.Models
+﻿namespace Server.Models
 {
-    public partial class MemberTypeAssignment
+    public partial class Membership
     {
         public int MemberId { get; set; }
         public int TypeId { get; set; }

@@ -7,10 +7,10 @@ namespace Server.Models
         public Member()
         {
             PhoneNumbers = new HashSet<PhoneNumber>();
+            Memberships = new HashSet<Membership>();
 
             Card = new HashSet<Card>();
             Loan = new HashSet<Loan>();
-            MemberTypeAssignment = new HashSet<MemberTypeAssignment>();
             Staff = new HashSet<Staff>();
         }
 
@@ -24,10 +24,10 @@ namespace Server.Models
         public virtual ICollection<PhoneNumber> PhoneNumbers { get; set; }
         public virtual Address CampusAddress { get; set; }
         public virtual Address HomeAddress { get; set; }
+        public virtual ICollection<Membership> Memberships { get; set; }
 
         public virtual ICollection<Card> Card { get; set; }
         public virtual ICollection<Loan> Loan { get; set; }
-        public virtual ICollection<MemberTypeAssignment> MemberTypeAssignment { get; set; }
         public virtual ICollection<Staff> Staff { get; set; }
     }
 }
