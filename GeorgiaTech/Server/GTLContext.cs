@@ -158,35 +158,46 @@ namespace Server
 
             modelBuilder.Entity<Loan>(entity =>
             {
-                entity.Property(e => e.LoanId).HasColumnName("loan_id");
+                entity.ToTable("Loan");
 
-                entity.Property(e => e.DueDate)
+                // key
+                entity.HasKey(loan => loan.LoanId);
+
+                // properties
+                entity.Property(loan => loan.LoanId)
+                    .HasColumnName("loan_id");
+
+                entity.Property(loan => loan.DueDate)
                     .HasColumnName("due_date")
                     .HasColumnType("date");
 
-                entity.Property(e => e.Extensions).HasColumnName("extensions");
+                entity.Property(loan => loan.Extensions)
+                    .HasColumnName("extensions");
 
-                entity.Property(e => e.LoanDate)
+                entity.Property(loan => loan.LoanDate)
                     .HasColumnName("loan_date")
                     .HasColumnType("date");
 
-                entity.Property(e => e.MemberId).HasColumnName("member_id");
+                entity.Property(loan => loan.MemberId)
+                    .HasColumnName("member_id");
 
-                entity.Property(e => e.ReturnedDate)
+                entity.Property(loan => loan.ReturnedDate)
                     .HasColumnName("returned_date")
                     .HasColumnType("date");
 
-                entity.Property(e => e.VolumeId).HasColumnName("volume_id");
+                entity.Property(loan => loan.VolumeId)
+                    .HasColumnName("volume_id");
 
-                entity.HasOne(d => d.Member)
-                    .WithMany(p => p.Loan)
-                    .HasForeignKey(d => d.MemberId)
+                // relationships
+                entity.HasOne(loan => loan.Member)
+                    .WithMany(member => member.Loans)
+                    .HasForeignKey(loan => loan.MemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_loan_member_id");
 
-                entity.HasOne(d => d.Volume)
-                    .WithMany(p => p.Loan)
-                    .HasForeignKey(d => d.VolumeId)
+                entity.HasOne(loan => loan.Volume)
+                    .WithMany(volume => volume.Loan)
+                    .HasForeignKey(loan => loan.VolumeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_loan_volume_id");
             });
@@ -374,6 +385,12 @@ namespace Server
                     .HasForeignKey(staff => staff.MemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_staff_member_id");
+
+                entity.HasMany(member => member.Loans)
+                    .WithOne(loan => loan.Member)
+                    .HasForeignKey(loan => loan.MemberId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_loan_member_id");
             });
 
             modelBuilder.Entity<MemberType>(entity =>
