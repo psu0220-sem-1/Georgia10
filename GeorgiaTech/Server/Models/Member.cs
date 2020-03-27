@@ -11,7 +11,6 @@ namespace Server.Models
             Cards = new HashSet<Card>();
 
             Loan = new HashSet<Loan>();
-            Staff = new HashSet<Staff>();
         }
 
         public int MemberId { get; set; }
@@ -28,6 +27,5 @@ namespace Server.Models
         public virtual ICollection<Card> Cards { get; set; }
 
         public virtual ICollection<Loan> Loan { get; set; }
-        public virtual ICollection<Staff> Staff { get; set; }
     }
 }

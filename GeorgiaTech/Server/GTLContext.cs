@@ -368,6 +368,12 @@ namespace Server
                     .HasForeignKey(card => card.MemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_card_member_id");
+
+                entity.HasMany<Staff>()
+                    .WithOne(staff => staff.Member)
+                    .HasForeignKey(staff => staff.MemberId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_staff_member_id");
             });
 
             modelBuilder.Entity<MemberType>(entity =>
@@ -455,19 +461,26 @@ namespace Server
 
             modelBuilder.Entity<Staff>(entity =>
             {
-                entity.HasKey(e => new { e.MemberId, e.JobTitle })
+                entity.ToTable("Staff");
+
+                // key
+                entity.HasKey(staff => new { staff.MemberId, staff.JobTitle })
                     .HasName("PK__Staff__0BCB6B8218681470");
 
-                entity.Property(e => e.MemberId).HasColumnName("member_id");
+                // properties
+                entity.Property(staff => staff.MemberId)
+                    .HasColumnName("member_id");
 
-                entity.Property(e => e.JobTitle)
+                entity.Property(staff => staff.JobTitle)
                     .HasColumnName("job_title")
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.Member)
-                    .WithMany(p => p.Staff)
-                    .HasForeignKey(d => d.MemberId)
+                // relationships
+                entity.HasOne(staff => staff.Member)
+                    .WithMany()
+                    .HasForeignKey(staff => staff.MemberId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_staff_member_id");
             });
 
