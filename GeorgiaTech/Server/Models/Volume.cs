@@ -6,7 +6,7 @@ namespace Server.Models
     {
         public Volume()
         {
-            Loan = new HashSet<Loan>();
+            Loans = new HashSet<Loan>();
         }
 
         public int VolumeId { get; set; }
@@ -18,6 +18,6 @@ namespace Server.Models
         public virtual Address CurrentLocation { get; set; }
         public virtual Address HomeLocation { get; set; }
 
-        public virtual ICollection<Loan> Loan { get; set; }
+        public virtual ICollection<Loan> Loans { get; set; }
     }
 }

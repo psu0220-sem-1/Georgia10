@@ -237,7 +237,7 @@ namespace Server
                     .HasConstraintName("FK_loan_member_id");
 
                 entity.HasOne(loan => loan.Volume)
-                    .WithMany(volume => volume.Loan)
+                    .WithMany(volume => volume.Loans)
                     .HasForeignKey(loan => loan.VolumeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_loan_volume_id");
@@ -646,6 +646,12 @@ namespace Server
                     .HasForeignKey(volume => volume.MaterialId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_volume_material_id");
+
+                entity.HasMany(volume => volume.Loans)
+                    .WithOne(loan => loan.Volume)
+                    .HasForeignKey(loan => loan.VolumeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_loan_volume_id");
             });
 
             modelBuilder.Entity<ZipCode>(entity =>
