@@ -293,6 +293,12 @@ namespace Server
                     .HasForeignKey<Acquire>(acquire => acquire.MaterialId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_acquire_material_id");
+
+                entity.HasMany(material => material.Volumes)
+                    .WithOne(volume => volume.Material)
+                    .HasForeignKey(volume => volume.MaterialId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_volume_material_id");
             });
 
             modelBuilder.Entity<MaterialAuthor>(entity =>
@@ -590,29 +596,40 @@ namespace Server
 
             modelBuilder.Entity<Volume>(entity =>
             {
-                entity.Property(e => e.VolumeId).HasColumnName("volume_id");
+                entity.ToTable("Volume");
 
-                entity.Property(e => e.CurrentLocationId).HasColumnName("current_location_id");
+                // key
+                entity.HasKey(volume => volume.VolumeId);
 
-                entity.Property(e => e.HomeLocationId).HasColumnName("home_location_id");
+                // properties
+                entity.Property(volume => volume.VolumeId)
+                    .HasColumnName("volume_id");
 
-                entity.Property(e => e.MaterialId).HasColumnName("material_id");
+                entity.Property(volume => volume.CurrentLocationId)
+                    .HasColumnName("current_location_id");
 
-                entity.HasOne(d => d.CurrentLocation)
-                    .WithMany(p => p.VolumeCurrentLocation)
-                    .HasForeignKey(d => d.CurrentLocationId)
+                entity.Property(volume => volume.HomeLocationId)
+                    .HasColumnName("home_location_id");
+
+                entity.Property(volume => volume.MaterialId)
+                    .HasColumnName("material_id");
+
+                // relationships
+                entity.HasOne(volume => volume.CurrentLocation)
+                    .WithMany()
+                    .HasForeignKey(volume => volume.CurrentLocationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_volume_current_location_id");
 
-                entity.HasOne(d => d.HomeLocation)
-                    .WithMany(p => p.VolumeHomeLocation)
-                    .HasForeignKey(d => d.HomeLocationId)
+                entity.HasOne(volume => volume.HomeLocation)
+                    .WithMany()
+                    .HasForeignKey(volume => volume.HomeLocationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_volume_home_location_id");
 
-                entity.HasOne(d => d.Material)
-                    .WithMany(p => p.Volume)
-                    .HasForeignKey(d => d.MaterialId)
+                entity.HasOne(volume => volume.Material)
+                    .WithMany(material => material.Volumes)
+                    .HasForeignKey(volume => volume.MaterialId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_volume_material_id");
             });

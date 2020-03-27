@@ -8,8 +8,7 @@ namespace Server.Models
         {
             MaterialSubjects = new HashSet<MaterialSubjects>();
             MaterialAuthors = new HashSet<MaterialAuthor>();
-
-            Volume = new HashSet<Volume>();
+            Volumes = new HashSet<Volume>();
         }
 
         public int MaterialId { get; set; }
@@ -24,7 +23,6 @@ namespace Server.Models
         public virtual ICollection<MaterialSubjects> MaterialSubjects { get; set; }
         public virtual ICollection<MaterialAuthor> MaterialAuthors { get; set; }
         public virtual Acquire Acquire { get; set; }
-
-        public virtual ICollection<Volume> Volume { get; set; }
+        public virtual ICollection<Volume> Volumes { get; set; }
     }
 }
