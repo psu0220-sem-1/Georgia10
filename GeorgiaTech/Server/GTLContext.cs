@@ -1,477 +1,685 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
+using Server.Models;
 
-namespace Server.Models
+namespace Server
 {
     public partial class GTLContext : DbContext
     {
-        public GTLContext()
-        {
-        }
+        public GTLContext(DbContextOptions<GTLContext> options) : base(options) { }
 
-        public GTLContext(DbContextOptions<GTLContext> options)
-            : base(options)
-        {
-        }
-
-        public virtual DbSet<Acquire> Acquire { get; set; }
-        public virtual DbSet<AcquireReason> AcquireReason { get; set; }
-        public virtual DbSet<Address> Address { get; set; }
-        public virtual DbSet<Author> Author { get; set; }
-        public virtual DbSet<Card> Card { get; set; }
-        public virtual DbSet<Loan> Loan { get; set; }
-        public virtual DbSet<Material> Material { get; set; }
-        public virtual DbSet<MaterialAuthor> MaterialAuthor { get; set; }
-        public virtual DbSet<MaterialSubject> MaterialSubject { get; set; }
-        public virtual DbSet<MaterialSubjectAssignment> MaterialSubjectAssignment { get; set; }
-        public virtual DbSet<MaterialType> MaterialType { get; set; }
-        public virtual DbSet<Member> Member { get; set; }
-        public virtual DbSet<MemberType> MemberType { get; set; }
-        public virtual DbSet<MemberTypeAssignment> MemberTypeAssignment { get; set; }
-        public virtual DbSet<PhoneNumber> PhoneNumber { get; set; }
+        public virtual DbSet<Acquire> Acquires { get; set; }
+        public virtual DbSet<AcquireReason> AcquireReasons { get; set; }
+        public virtual DbSet<Address> Addresses { get; set; }
+        public virtual DbSet<Author> Authors { get; set; }
+        public virtual DbSet<Card> Cards { get; set; }
+        public virtual DbSet<Loan> Loans { get; set; }
+        public virtual DbSet<Material> Materials { get; set; }
+        public virtual DbSet<MaterialAuthor> MaterialAuthors { get; set; }
+        public virtual DbSet<MaterialSubject> MaterialSubjects { get; set; }
+        public virtual DbSet<MaterialSubjects> MaterialSubjectAssignments { get; set; }
+        public virtual DbSet<MaterialType> MaterialTypes { get; set; }
+        public virtual DbSet<Member> Members { get; set; }
+        public virtual DbSet<MemberType> MemberTypes { get; set; }
+        public virtual DbSet<Membership> Memberships { get; set; }
+        public virtual DbSet<PhoneNumber> PhoneNumbers { get; set; }
         public virtual DbSet<Staff> Staff { get; set; }
-        public virtual DbSet<Volume> Volume { get; set; }
-        public virtual DbSet<ZipCode> ZipCode { get; set; }
-
-        /*
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer("Data Source=localhost; Initial Catalog=gtl; user=sa; password=admin8789");
-            }
-        }
-        */
+        public virtual DbSet<Volume> Volumes { get; set; }
+        public virtual DbSet<ZipCode> ZipCodes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Acquire>(entity =>
             {
-                entity.HasKey(e => e.MaterialId)
+                entity.ToTable("Acquire");
+
+                // key
+                entity.HasKey(acquire => acquire.MaterialId)
                     .HasName("PK__Acquire__6BFE1D288709E86E");
 
-                entity.Property(e => e.MaterialId)
+                // properties
+                entity.Property(acquire => acquire.MaterialId)
                     .HasColumnName("material_id")
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.AdditionalInfo)
+                entity.Property(acquire => acquire.AdditionalInfo)
                     .IsRequired()
                     .HasColumnName("additional_info")
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ReasonId).HasColumnName("reason_id");
+                entity.Property(acquire => acquire.ReasonId)
+                    .HasColumnName("reason_id");
 
-                entity.HasOne(d => d.Material)
-                    .WithOne(p => p.Acquire)
-                    .HasForeignKey<Acquire>(d => d.MaterialId)
+                // relationships
+                entity.HasOne(acquire => acquire.Material)
+                    .WithOne(material => material.Acquire)
+                    .HasForeignKey<Acquire>(acquire => acquire.MaterialId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_acquire_material_id");
 
-                entity.HasOne(d => d.Reason)
-                    .WithMany(p => p.Acquire)
-                    .HasForeignKey(d => d.ReasonId)
+                entity.HasOne(acquire => acquire.Reason)
+                    .WithMany()
+                    .HasForeignKey(acquire => acquire.ReasonId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_acquire_reason_id");
             });
 
             modelBuilder.Entity<AcquireReason>(entity =>
             {
-                entity.HasKey(e => e.ReasonId)
-                    .HasName("PK__Acquire___846BB554B66E8A55");
-
                 entity.ToTable("Acquire_Reason");
 
-                entity.Property(e => e.ReasonId).HasColumnName("reason_id");
+                // key
+                entity.HasKey(acquireReason => acquireReason.ReasonId)
+                    .HasName("PK__Acquire___846BB554B66E8A55");
 
-                entity.Property(e => e.Reason)
+                // properties
+                entity.Property(acquireReason => acquireReason.ReasonId)
+                    .HasColumnName("reason_id");
+
+                entity.Property(acquireReason => acquireReason.Reason)
                     .HasColumnName("reason")
                     .HasMaxLength(42)
                     .IsUnicode(false);
+
+                // relationships
+                entity.HasMany<Acquire>()
+                    .WithOne(acquire => acquire.Reason)
+                    .HasForeignKey(acquire => acquire.ReasonId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_acquire_reason_id");
             });
 
             modelBuilder.Entity<Address>(entity =>
             {
-                entity.Property(e => e.AddressId).HasColumnName("address_id");
+                entity.ToTable("address");
 
-                entity.Property(e => e.AdditionalInfo)
+                // key
+                entity.HasKey(address => address.AddressId);
+
+                // properties
+                entity.Property(address => address.AdditionalInfo)
+                    .IsRequired(false)
                     .HasColumnName("additional_info")
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Street)
+                entity.Property(address => address.Street)
                     .IsRequired()
                     .HasColumnName("street")
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Zip).HasColumnName("zip");
+                entity.Property(address => address.Zip)
+                    .HasColumnName("zip");
 
-                entity.HasOne(d => d.ZipNavigation)
-                    .WithMany(p => p.Address)
-                    .HasForeignKey(d => d.Zip)
+                // relations
+                // don't set a navigational property on the zip side
+                entity.HasOne(address => address.Zip)
+                    .WithMany()
+                    .HasForeignKey(address => address.ZipCode)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_address_zip");
+
+                entity.HasMany<Member>()
+                    .WithOne(member => member.HomeAddress)
+                    .HasForeignKey(member => member.HomeAddressId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_member_home_address_id");
+
+                entity.HasMany<Member>()
+                    .WithOne(member => member.CampusAddress)
+                    .HasForeignKey(member => member.CampusAddressId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_member_campus_address_id");
+
+                entity.HasMany<Volume>()
+                    .WithOne(volume => volume.HomeLocation)
+                    .HasForeignKey(volume => volume.HomeLocationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_volume_home_location_id");
+
+                entity.HasMany<Volume>()
+                    .WithOne(volume => volume.CurrentLocation)
+                    .HasForeignKey(volume => volume.CurrentLocationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_volume_current_location_id");
             });
 
             modelBuilder.Entity<Author>(entity =>
             {
-                entity.Property(e => e.AuthorId).HasColumnName("author_id");
+                // key
+                entity.HasKey(author => author.AuthorId);
 
-                entity.Property(e => e.FirstName)
+                // properties
+                entity.Property(author => author.AuthorId)
+                    .HasColumnName("author_id");
+
+                entity.Property(author => author.FirstName)
                     .IsRequired()
                     .HasColumnName("first_name")
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.LastName)
+                entity.Property(author => author.LastName)
                     .IsRequired()
                     .HasColumnName("last_name")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                // relationships
+                entity.HasMany(author => author.AuthorMaterials)
+                    .WithOne(materialAuthor => materialAuthor.Author)
+                    .HasForeignKey(materialAuthor => materialAuthor.AuthorId)
+                    .HasConstraintName("FK_material_authors_author_id");
             });
 
             modelBuilder.Entity<Card>(entity =>
             {
-                entity.HasKey(e => new { e.MemberId, e.PhotoPath })
+                entity.ToTable("Card");
+
+                // key
+                entity.HasKey(card => new { card.MemberId, card.PhotoPath })
                     .HasName("PK__Card__52CBC9551B281D9F");
 
-                entity.Property(e => e.MemberId).HasColumnName("member_id");
+                // properties
+                entity.Property(card => card.MemberId)
+                    .HasColumnName("member_id");
 
-                entity.Property(e => e.PhotoPath)
+                entity.Property(card => card.PhotoPath)
                     .HasColumnName("photo_path")
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.Member)
-                    .WithMany(p => p.Card)
-                    .HasForeignKey(d => d.MemberId)
+                // relationships
+                entity.HasOne(card => card.Member)
+                    .WithMany(member => member.Cards)
+                    .HasForeignKey(card => card.MemberId)
                     .HasConstraintName("FK_card_member_id");
             });
 
             modelBuilder.Entity<Loan>(entity =>
             {
-                entity.Property(e => e.LoanId).HasColumnName("loan_id");
+                entity.ToTable("Loan");
 
-                entity.Property(e => e.DueDate)
+                // key
+                entity.HasKey(loan => loan.LoanId);
+
+                // properties
+                entity.Property(loan => loan.LoanId)
+                    .HasColumnName("loan_id");
+
+                entity.Property(loan => loan.DueDate)
                     .HasColumnName("due_date")
                     .HasColumnType("date");
 
-                entity.Property(e => e.Extensions).HasColumnName("extensions");
+                entity.Property(loan => loan.Extensions)
+                    .HasColumnName("extensions");
 
-                entity.Property(e => e.LoanDate)
+                entity.Property(loan => loan.LoanDate)
                     .HasColumnName("loan_date")
                     .HasColumnType("date");
 
-                entity.Property(e => e.MemberId).HasColumnName("member_id");
+                entity.Property(loan => loan.MemberId)
+                    .HasColumnName("member_id");
 
-                entity.Property(e => e.ReturnedDate)
+                entity.Property(loan => loan.ReturnedDate)
                     .HasColumnName("returned_date")
                     .HasColumnType("date");
 
-                entity.Property(e => e.VolumeId).HasColumnName("volume_id");
+                entity.Property(loan => loan.VolumeId)
+                    .HasColumnName("volume_id");
 
-                entity.HasOne(d => d.Member)
-                    .WithMany(p => p.Loan)
-                    .HasForeignKey(d => d.MemberId)
+                // relationships
+                entity.HasOne(loan => loan.Member)
+                    .WithMany(member => member.Loans)
+                    .HasForeignKey(loan => loan.MemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_loan_member_id");
 
-                entity.HasOne(d => d.Volume)
-                    .WithMany(p => p.Loan)
-                    .HasForeignKey(d => d.VolumeId)
+                entity.HasOne(loan => loan.Volume)
+                    .WithMany(volume => volume.Loans)
+                    .HasForeignKey(loan => loan.VolumeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_loan_volume_id");
             });
 
             modelBuilder.Entity<Material>(entity =>
             {
-                entity.Property(e => e.MaterialId).HasColumnName("material_id");
+                entity.ToTable("Material");
 
-                entity.Property(e => e.Description)
+                // key
+                entity.HasKey(material => material.MaterialId);
+
+                // properties
+                entity.Property(material => material.MaterialId)
+                    .HasColumnName("material_id");
+
+                entity.Property(material => material.Description)
                     .IsRequired()
                     .HasColumnName("description")
                     .IsUnicode(false);
 
-                entity.Property(e => e.Isbn)
+                entity.Property(material => material.Isbn)
                     .IsRequired()
                     .HasColumnName("isbn")
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Language)
+                entity.Property(material => material.Language)
                     .IsRequired()
                     .HasColumnName("language")
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Lendable).HasColumnName("lendable");
+                entity.Property(material => material.Lendable)
+                    .HasColumnName("lendable");
 
-                entity.Property(e => e.Title)
+                entity.Property(material => material.Title)
                     .IsRequired()
                     .HasColumnName("title")
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.TypeId).HasColumnName("type_id");
+                entity.Property(material => material.TypeId)
+                    .HasColumnName("type_id");
 
-                entity.HasOne(d => d.Type)
-                    .WithMany(p => p.Material)
-                    .HasForeignKey(d => d.TypeId)
+                // relationships
+                entity.HasOne(material => material.Type)
+                    .WithMany()
+                    .HasForeignKey(material => material.TypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_material_type_id");
+
+                entity.HasMany(material => material.MaterialSubjects)
+                    .WithOne(materialSubjects => materialSubjects.Material)
+                    .HasForeignKey(materialSubjects => materialSubjects.MaterialId)
+                    .OnDelete(DeleteBehavior.ClientNoAction)
+                    .HasConstraintName("FK_material_subject_assignment_material_id");
+
+                entity.HasMany(material => material.MaterialAuthors)
+                    .WithOne(materialAuthor => materialAuthor.Material)
+                    .HasForeignKey(materialAuthor => materialAuthor.MaterialId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_material_authors_material_id");
+
+                entity.HasOne(material => material.Acquire)
+                    .WithOne(acquire => acquire.Material)
+                    .HasForeignKey<Acquire>(acquire => acquire.MaterialId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_acquire_material_id");
+
+                entity.HasMany(material => material.Volumes)
+                    .WithOne(volume => volume.Material)
+                    .HasForeignKey(volume => volume.MaterialId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_volume_material_id");
             });
 
             modelBuilder.Entity<MaterialAuthor>(entity =>
             {
-                entity.HasKey(e => new { e.MaterialId, e.AuthorId })
-                    .HasName("PK__Material__839B0B943E2277FF");
-
                 entity.ToTable("Material_Author");
 
-                entity.Property(e => e.MaterialId).HasColumnName("material_id");
+                // key
+                entity.HasKey(materialAuthor => new { materialAuthor.MaterialId, materialAuthor.AuthorId })
+                    .HasName("PK__Material__839B0B943E2277FF");
 
-                entity.Property(e => e.AuthorId).HasColumnName("author_id");
+                // properties
+                entity.Property(materialAuthor => materialAuthor.MaterialId)
+                    .HasColumnName("material_id");
 
-                entity.HasOne(d => d.Author)
-                    .WithMany(p => p.MaterialAuthor)
-                    .HasForeignKey(d => d.AuthorId)
+                entity.Property(materialAuthor => materialAuthor.AuthorId)
+                    .HasColumnName("author_id");
+
+                // relationships
+                entity.HasOne(materialAuthor => materialAuthor.Author)
+                    .WithMany(author => author.AuthorMaterials)
+                    .HasForeignKey(materialAuthor => materialAuthor.AuthorId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_material_authors_author_id");
 
-                entity.HasOne(d => d.Material)
-                    .WithMany(p => p.MaterialAuthor)
-                    .HasForeignKey(d => d.MaterialId)
+                entity.HasOne(materialAuthor => materialAuthor.Material)
+                    .WithMany(material => material.MaterialAuthors)
+                    .HasForeignKey(materialAuthor => materialAuthor.MaterialId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_material_authors_material_id");
             });
 
             modelBuilder.Entity<MaterialSubject>(entity =>
             {
-                entity.HasKey(e => e.SubjectId)
-                    .HasName("PK__Material__5004F660A42AA2F8");
-
                 entity.ToTable("Material_Subject");
 
-                entity.Property(e => e.SubjectId).HasColumnName("subject_id");
+                // key
+                entity.HasKey(materialSubject => materialSubject.SubjectId)
+                    .HasName("PK__Material__5004F660A42AA2F8");
 
-                entity.Property(e => e.Subject)
+                // properties
+                entity.Property(materialSubject => materialSubject.SubjectId)
+                    .HasColumnName("subject_id");
+
+                entity.Property(materialSubject => materialSubject.SubjectName)
                     .IsRequired()
                     .HasColumnName("subject")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                // relationships
+                entity.HasMany<MaterialSubjects>()
+                    .WithOne(materialSubjects => materialSubjects.MaterialSubject)
+                    .HasForeignKey(materialSubjects => materialSubjects.SubjectId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_material_subject_assignment_subject_id");
             });
 
-            modelBuilder.Entity<MaterialSubjectAssignment>(entity =>
+            modelBuilder.Entity<MaterialSubjects>(entity =>
             {
-                entity.HasKey(e => new { e.MaterialId, e.SubjectId })
-                    .HasName("PK__Material__7EFE524E1E40022E");
-
                 entity.ToTable("Material_Subject_Assignment");
 
-                entity.Property(e => e.MaterialId).HasColumnName("material_id");
+                // key
+                entity.HasKey(materialSubjects => new { materialSubjects.MaterialId, materialSubjects.SubjectId })
+                    .HasName("PK__Material__7EFE524E1E40022E");
 
-                entity.Property(e => e.SubjectId).HasColumnName("subject_id");
+                // properties
+                entity.Property(materialSubjects => materialSubjects.MaterialId)
+                    .HasColumnName("material_id");
 
-                entity.HasOne(d => d.Material)
-                    .WithMany(p => p.MaterialSubjectAssignment)
-                    .HasForeignKey(d => d.MaterialId)
+                entity.Property(materialSubjects => materialSubjects.SubjectId)
+                    .HasColumnName("subject_id");
+
+                // relationships
+                entity.HasOne(materialSubjects => materialSubjects.Material)
+                    .WithMany(material => material.MaterialSubjects)
+                    .HasForeignKey(materialSubjects => materialSubjects.MaterialId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_material_subject_assignment_material_id");
 
-                entity.HasOne(d => d.Subject)
-                    .WithMany(p => p.MaterialSubjectAssignment)
-                    .HasForeignKey(d => d.SubjectId)
+                entity.HasOne(materialSubjects => materialSubjects.MaterialSubject)
+                    .WithMany()
+                    .HasForeignKey(materialSubjects => materialSubjects.SubjectId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_material_subject_assignment_subject_id");
             });
 
             modelBuilder.Entity<MaterialType>(entity =>
             {
-                entity.HasKey(e => e.TypeId)
-                    .HasName("PK__Material__2C000598CDAD1BE3");
-
                 entity.ToTable("Material_Type");
 
-                entity.Property(e => e.TypeId).HasColumnName("type_id");
+                // key
+                entity.HasKey(materialType => materialType.TypeId)
+                    .HasName("PK__Material__2C000598CDAD1BE3");
 
-                entity.Property(e => e.Type)
+                // properties
+                entity.Property(materialType => materialType.TypeId)
+                    .HasColumnName("type_id");
+
+                entity.Property(materialType => materialType.Type)
                     .IsRequired()
                     .HasColumnName("type")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                // relationships
+                entity.HasMany<Material>()
+                    .WithOne(material => material.Type)
+                    .HasForeignKey(material => material.TypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_material_type_id");
             });
 
             modelBuilder.Entity<Member>(entity =>
             {
-                entity.Property(e => e.MemberId).HasColumnName("member_id");
+                entity.ToTable("member");
 
-                entity.Property(e => e.CampusAddressId).HasColumnName("campus_address_id");
+                // key
+                entity.HasKey(member => member.MemberId);
 
-                entity.Property(e => e.FName)
-                    .IsRequired()
-                    .HasColumnName("f_name")
-                    .HasMaxLength(25)
-                    .IsUnicode(false);
 
-                entity.Property(e => e.HomeAddressId).HasColumnName("home_address_id");
+                // properties
+                entity.Property(member => member.MemberId)
+                    .HasColumnName("member_id");
 
-                entity.Property(e => e.LName)
-                    .IsRequired()
-                    .HasColumnName("l_name")
-                    .HasMaxLength(25)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Ssn)
+                entity.Property(member => member.Ssn)
                     .IsRequired()
                     .HasColumnName("ssn")
                     .HasMaxLength(10)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.CampusAddress)
-                    .WithMany(p => p.MemberCampusAddress)
-                    .HasForeignKey(d => d.CampusAddressId)
+                entity.Property(member => member.FName)
+                    .IsRequired()
+                    .HasColumnName("f_name")
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(member => member.LName)
+                    .IsRequired()
+                    .HasColumnName("l_name")
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(member => member.CampusAddressId)
+                    .HasColumnName("campus_address_id");
+
+
+                entity.Property(member => member.HomeAddressId)
+                    .HasColumnName("home_address_id");
+
+                // relations
+                entity.HasOne(member => member.CampusAddress)
+                    .WithMany()
+                    .HasForeignKey(member => member.CampusAddressId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_member_campus_address_id");
 
-                entity.HasOne(d => d.HomeAddress)
-                    .WithMany(p => p.MemberHomeAddress)
-                    .HasForeignKey(d => d.HomeAddressId)
+                entity.HasOne(member => member.HomeAddress)
+                    .WithMany()
+                    .HasForeignKey(member => member.HomeAddressId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_member_home_address_id");
+
+                entity.HasMany(member => member.Memberships)
+                    .WithOne(membership => membership.Member)
+                    .HasForeignKey(membership => membership.MemberId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_member_type_assignment_member_id");
+
+                entity.HasMany(member => member.Cards)
+                    .WithOne(card => card.Member)
+                    .HasForeignKey(card => card.MemberId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_card_member_id");
+
+                entity.HasMany<Staff>()
+                    .WithOne(staff => staff.Member)
+                    .HasForeignKey(staff => staff.MemberId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_staff_member_id");
+
+                entity.HasMany(member => member.Loans)
+                    .WithOne(loan => loan.Member)
+                    .HasForeignKey(loan => loan.MemberId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_loan_member_id");
             });
 
             modelBuilder.Entity<MemberType>(entity =>
             {
+                entity.ToTable("Member_Type");
+
+                // key
                 entity.HasKey(e => e.TypeId)
                     .HasName("PK__Member_T__2C0005984BECC0B7");
 
-                entity.ToTable("Member_Type");
-
-                entity.HasIndex(e => e.Type)
+                entity.HasIndex(e => e.TypeName)
                     .HasName("UQ__Member_T__E3F852486B4A84B2")
                     .IsUnique();
 
-                entity.Property(e => e.TypeId).HasColumnName("type_id");
+                // properties
+                entity.Property(e => e.TypeId)
+                    .HasColumnName("type_id");
 
-                entity.Property(e => e.Type)
+                entity.Property(e => e.TypeName)
                     .IsRequired()
                     .HasColumnName("type")
                     .HasMaxLength(25)
                     .IsUnicode(false);
+
+                // relationships
+                entity.HasMany<Membership>()
+                    .WithOne(membership => membership.MemberType)
+                    .HasForeignKey(membership => membership.TypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_member_type_assignment_type_id");
             });
 
-            modelBuilder.Entity<MemberTypeAssignment>(entity =>
+            modelBuilder.Entity<Membership>(entity =>
             {
-                entity.HasKey(e => new { e.MemberId, e.TypeId })
-                    .HasName("PK__Member_T__205B856DB2C31985");
-
                 entity.ToTable("Member_Type_Assignment");
 
-                entity.Property(e => e.MemberId).HasColumnName("member_id");
+                // key
+                entity.HasKey(membership => new { membership.MemberId, membership.TypeId })
+                    .HasName("PK__Member_T__205B856DB2C31985");
 
-                entity.Property(e => e.TypeId).HasColumnName("type_id");
+                // properties
+                entity.Property(e => e.MemberId)
+                    .HasColumnName("member_id");
 
-                entity.HasOne(d => d.Member)
-                    .WithMany(p => p.MemberTypeAssignment)
-                    .HasForeignKey(d => d.MemberId)
+                entity.Property(e => e.TypeId)
+                    .HasColumnName("type_id");
+
+                // relationships
+                entity.HasOne(membership => membership.Member)
+                    .WithMany(member => member.Memberships)
+                    .HasForeignKey(membership => membership.MemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_member_type_assignment_member_id");
 
-                entity.HasOne(d => d.Type)
-                    .WithMany(p => p.MemberTypeAssignment)
-                    .HasForeignKey(d => d.TypeId)
+                entity.HasOne(membership => membership.MemberType)
+                    .WithMany()
+                    .HasForeignKey(membership => membership.TypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_member_type_assignment_type_id");
             });
 
             modelBuilder.Entity<PhoneNumber>(entity =>
             {
-                entity.HasKey(e => new { e.MemberId, e.PhoneNumber1 })
-                    .HasName("PK__Phone_Nu__0882B39245F31267");
-
                 entity.ToTable("Phone_Number");
 
-                entity.Property(e => e.MemberId).HasColumnName("member_id");
+                // key
+                entity.HasKey(phone => new { phone.MemberId, phone.Number })
+                    .HasName("PK__Phone_Nu__0882B39245F31267");
 
-                entity.Property(e => e.PhoneNumber1)
+                // properties
+                entity.Property(phone => phone.MemberId)
+                    .HasColumnName("member_id");
+
+                entity.Property(phone => phone.Number)
                     .HasColumnName("phone_number")
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.Member)
-                    .WithMany(p => p.PhoneNumber)
-                    .HasForeignKey(d => d.MemberId)
+                // relations
+                entity.HasOne(phone => phone.Member)
+                    .WithMany(member => member.PhoneNumbers)
+                    .HasForeignKey(phone => phone.MemberId)
                     .HasConstraintName("FK_phone_number_member_id");
             });
 
             modelBuilder.Entity<Staff>(entity =>
             {
-                entity.HasKey(e => new { e.MemberId, e.JobTitle })
+                entity.ToTable("Staff");
+
+                // key
+                entity.HasKey(staff => new { staff.MemberId, staff.JobTitle })
                     .HasName("PK__Staff__0BCB6B8218681470");
 
-                entity.Property(e => e.MemberId).HasColumnName("member_id");
+                // properties
+                entity.Property(staff => staff.MemberId)
+                    .HasColumnName("member_id");
 
-                entity.Property(e => e.JobTitle)
+                entity.Property(staff => staff.JobTitle)
                     .HasColumnName("job_title")
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.Member)
-                    .WithMany(p => p.Staff)
-                    .HasForeignKey(d => d.MemberId)
+                // relationships
+                entity.HasOne(staff => staff.Member)
+                    .WithMany()
+                    .HasForeignKey(staff => staff.MemberId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_staff_member_id");
             });
 
             modelBuilder.Entity<Volume>(entity =>
             {
-                entity.Property(e => e.VolumeId).HasColumnName("volume_id");
+                entity.ToTable("Volume");
 
-                entity.Property(e => e.CurrentLocationId).HasColumnName("current_location_id");
+                // key
+                entity.HasKey(volume => volume.VolumeId);
 
-                entity.Property(e => e.HomeLocationId).HasColumnName("home_location_id");
+                // properties
+                entity.Property(volume => volume.VolumeId)
+                    .HasColumnName("volume_id");
 
-                entity.Property(e => e.MaterialId).HasColumnName("material_id");
+                entity.Property(volume => volume.CurrentLocationId)
+                    .HasColumnName("current_location_id");
 
-                entity.HasOne(d => d.CurrentLocation)
-                    .WithMany(p => p.VolumeCurrentLocation)
-                    .HasForeignKey(d => d.CurrentLocationId)
+                entity.Property(volume => volume.HomeLocationId)
+                    .HasColumnName("home_location_id");
+
+                entity.Property(volume => volume.MaterialId)
+                    .HasColumnName("material_id");
+
+                // relationships
+                entity.HasOne(volume => volume.CurrentLocation)
+                    .WithMany()
+                    .HasForeignKey(volume => volume.CurrentLocationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_volume_current_location_id");
 
-                entity.HasOne(d => d.HomeLocation)
-                    .WithMany(p => p.VolumeHomeLocation)
-                    .HasForeignKey(d => d.HomeLocationId)
+                entity.HasOne(volume => volume.HomeLocation)
+                    .WithMany()
+                    .HasForeignKey(volume => volume.HomeLocationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_volume_home_location_id");
 
-                entity.HasOne(d => d.Material)
-                    .WithMany(p => p.Volume)
-                    .HasForeignKey(d => d.MaterialId)
+                entity.HasOne(volume => volume.Material)
+                    .WithMany(material => material.Volumes)
+                    .HasForeignKey(volume => volume.MaterialId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_volume_material_id");
+
+                entity.HasMany(volume => volume.Loans)
+                    .WithOne(loan => loan.Volume)
+                    .HasForeignKey(loan => loan.VolumeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_loan_volume_id");
             });
 
             modelBuilder.Entity<ZipCode>(entity =>
             {
-                entity.HasKey(e => e.Zip)
-                    .HasName("PK__Zip_Code__30B369C4BB6ACBF8");
-
                 entity.ToTable("Zip_Code");
 
-                entity.Property(e => e.Zip)
+                // key
+                entity.HasKey(zip => zip.Code)
+                    .HasName("PK__Zip_Code__30B369C4BB6ACBF8");
+
+                // properties
+                entity.Property(zip => zip.Code)
                     .HasColumnName("zip")
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.City)
+                entity.Property(zip => zip.City)
                     .IsRequired()
                     .HasColumnName("city")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                // relationships
+                // don't set the zip to have a navigational property, like in address, but the inverse
+                entity.HasMany<Address>()
+                    .WithOne(address => address.Zip)
+                    .HasForeignKey(address => address.ZipCode);
             });
 
-            OnModelCreatingPartial(modelBuilder);
         }
-
-        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }
