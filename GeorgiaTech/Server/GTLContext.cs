@@ -98,12 +98,22 @@ namespace Server.Models
                     .HasColumnName("zip");
 
                 // relations
+                // don't set a navigational property on the zip side
                 entity.HasOne(address => address.Zip)
-                    .WithMany() // don't set a navigational property on the zip side
+                    .WithMany()
                     .HasForeignKey(address => address.ZipCode)
                     .OnDelete(DeleteBehavior.ClientNoAction)
                     .HasConstraintName("FK_address_zip");
 
+                entity.HasMany<Member>()
+                    .WithOne(member => member.HomeAddress)
+                    .HasForeignKey(member => member.HomeAddressId)
+                    .HasConstraintName("FK_member_home_address_id");
+
+                entity.HasMany<Member>()
+                    .WithOne(member => member.CampusAddress)
+                    .HasForeignKey(member => member.CampusAddressId)
+                    .HasConstraintName("FK_member_campus_address_id");
             });
 
             modelBuilder.Entity<Author>(entity =>
@@ -331,13 +341,13 @@ namespace Server.Models
 
                 // relations
                 entity.HasOne(member => member.CampusAddress)
-                    .WithMany(p => p.MemberCampusAddress)
+                    .WithMany()
                     .HasForeignKey(member => member.CampusAddressId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_member_campus_address_id");
 
                 entity.HasOne(member => member.HomeAddress)
-                    .WithMany(p => p.MemberHomeAddress)
+                    .WithMany()
                     .HasForeignKey(member => member.HomeAddressId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_member_home_address_id");

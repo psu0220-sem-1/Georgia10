@@ -6,8 +6,6 @@ namespace Server.Models
     {
         public Address()
         {
-            MemberCampusAddress = new HashSet<Member>();
-            MemberHomeAddress = new HashSet<Member>();
             VolumeCurrentLocation = new HashSet<Volume>();
             VolumeHomeLocation = new HashSet<Volume>();
         }
@@ -19,8 +17,6 @@ namespace Server.Models
 
         public virtual ZipCode Zip { get; set; }
 
-        public virtual ICollection<Member> MemberCampusAddress { get; set; }
-        public virtual ICollection<Member> MemberHomeAddress { get; set; }
         public virtual ICollection<Volume> VolumeCurrentLocation { get; set; }
         public virtual ICollection<Volume> VolumeHomeLocation { get; set; }
     }

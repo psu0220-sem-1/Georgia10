@@ -22,9 +22,9 @@ namespace Server.Models
         public int CampusAddressId { get; set; }
 
         public virtual ICollection<PhoneNumber> PhoneNumbers { get; set; }
-
         public virtual Address CampusAddress { get; set; }
         public virtual Address HomeAddress { get; set; }
+
         public virtual ICollection<Card> Card { get; set; }
         public virtual ICollection<Loan> Loan { get; set; }
         public virtual ICollection<MemberTypeAssignment> MemberTypeAssignment { get; set; }
