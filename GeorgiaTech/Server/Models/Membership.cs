@@ -6,6 +6,6 @@
         public int TypeId { get; set; }
 
         public virtual Member Member { get; set; }
-        public virtual MemberType Type { get; set; }
+        public virtual MemberType MemberType { get; set; }
     }
 }
