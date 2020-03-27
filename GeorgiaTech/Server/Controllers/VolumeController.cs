@@ -55,7 +55,19 @@ namespace Server.Controllers
 
         public Volume FindByID(int ID)
         {
-            throw new NotImplementedException();
+            var volume = _context.Volume
+                .Include(v => v.Material)
+                    .ThenInclude(m => m.MaterialAuthor)
+                        .ThenInclude(ma => ma.Author)
+                .Include(v => v.Material)
+                    .ThenInclude(m => m.MaterialSubjectAssignment)
+                        .ThenInclude(ms => ms.Subject)
+                .Include(v => v.HomeLocation)
+                    .ThenInclude(a => a.ZipNavigation)
+                .Include(v => v.CurrentLocation)
+                    .ThenInclude(a => a.ZipNavigation).Single(v => v.VolumeId == ID);
+
+            return volume;
         }
 
         public Volume FindByType(Volume t)

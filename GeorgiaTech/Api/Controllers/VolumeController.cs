@@ -18,7 +18,7 @@ namespace Api.Controllers
         {
             volumeController = new Server.Controllers.VolumeController(context);
         }
-        // GET: api/values
+        // GET: /volume
         [HttpGet]
         public List<Models.Volume> Get()
         {
@@ -82,9 +82,11 @@ namespace Api.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public Models.Volume Get(int id)
         {
-            return "value";
+            var volume = volumeController.FindByID(id);
+            var volumeModel = BuildVolume(volume);
+            return volumeModel;
         }
 
         // POST api/values
