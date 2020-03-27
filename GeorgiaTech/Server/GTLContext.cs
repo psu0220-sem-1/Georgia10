@@ -16,7 +16,7 @@ namespace Server
         public virtual DbSet<Material> Material { get; set; }
         public virtual DbSet<MaterialAuthor> MaterialAuthor { get; set; }
         public virtual DbSet<MaterialSubject> MaterialSubject { get; set; }
-        public virtual DbSet<MaterialSubjectAssignment> MaterialSubjectAssignment { get; set; }
+        public virtual DbSet<MaterialSubjects> MaterialSubjectAssignment { get; set; }
         public virtual DbSet<MaterialType> MaterialType { get; set; }
         public virtual DbSet<Member> Member { get; set; }
         public virtual DbSet<MemberType> MemberType { get; set; }
@@ -248,6 +248,12 @@ namespace Server
                     .HasForeignKey(material => material.TypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_material_type_id");
+
+                entity.HasMany(material => material.MaterialSubjects)
+                    .WithOne(materialSubjects => materialSubjects.Material)
+                    .HasForeignKey(materialSubjects => materialSubjects.MaterialId)
+                    .OnDelete(DeleteBehavior.ClientNoAction)
+                    .HasConstraintName("FK_material_subject_assignment_material_id");
             });
 
             modelBuilder.Entity<MaterialAuthor>(entity =>
@@ -275,39 +281,55 @@ namespace Server
 
             modelBuilder.Entity<MaterialSubject>(entity =>
             {
-                entity.HasKey(e => e.SubjectId)
-                    .HasName("PK__Material__5004F660A42AA2F8");
-
                 entity.ToTable("Material_Subject");
 
-                entity.Property(e => e.SubjectId).HasColumnName("subject_id");
+                // key
+                entity.HasKey(materialSubject => materialSubject.SubjectId)
+                    .HasName("PK__Material__5004F660A42AA2F8");
 
-                entity.Property(e => e.Subject)
+                // properties
+                entity.Property(materialSubject => materialSubject.SubjectId)
+                    .HasColumnName("subject_id");
+
+                entity.Property(materialSubject => materialSubject.SubjectName)
                     .IsRequired()
                     .HasColumnName("subject")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                // relationships
+                entity.HasMany<MaterialSubjects>()
+                    .WithOne(materialSubjects => materialSubjects.MaterialSubject)
+                    .HasForeignKey(materialSubjects => materialSubjects.SubjectId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_material_subject_assignment_subject_id");
             });
 
-            modelBuilder.Entity<MaterialSubjectAssignment>(entity =>
+            modelBuilder.Entity<MaterialSubjects>(entity =>
             {
-                entity.HasKey(e => new { e.MaterialId, e.SubjectId })
-                    .HasName("PK__Material__7EFE524E1E40022E");
-
                 entity.ToTable("Material_Subject_Assignment");
 
-                entity.Property(e => e.MaterialId).HasColumnName("material_id");
+                // key
+                entity.HasKey(materialSubjects => new { materialSubjects.MaterialId, materialSubjects.SubjectId })
+                    .HasName("PK__Material__7EFE524E1E40022E");
 
-                entity.Property(e => e.SubjectId).HasColumnName("subject_id");
+                // properties
+                entity.Property(materialSubjects => materialSubjects.MaterialId)
+                    .HasColumnName("material_id");
 
-                entity.HasOne(d => d.Material)
-                    .WithMany(p => p.MaterialSubjectAssignment)
-                    .HasForeignKey(d => d.MaterialId)
+                entity.Property(materialSubjects => materialSubjects.SubjectId)
+                    .HasColumnName("subject_id");
+
+                // relationships
+                entity.HasOne(materialSubjects => materialSubjects.Material)
+                    .WithMany(material => material.MaterialSubjects)
+                    .HasForeignKey(materialSubjects => materialSubjects.MaterialId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_material_subject_assignment_material_id");
 
-                entity.HasOne(d => d.Subject)
-                    .WithMany(p => p.MaterialSubjectAssignment)
-                    .HasForeignKey(d => d.SubjectId)
+                entity.HasOne(materialSubjects => materialSubjects.MaterialSubject)
+                    .WithMany()
+                    .HasForeignKey(materialSubjects => materialSubjects.SubjectId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_material_subject_assignment_subject_id");
             });
@@ -421,7 +443,7 @@ namespace Server
                 entity.HasKey(e => e.TypeId)
                     .HasName("PK__Member_T__2C0005984BECC0B7");
 
-                entity.HasIndex(e => e.Type)
+                entity.HasIndex(e => e.TypeName)
                     .HasName("UQ__Member_T__E3F852486B4A84B2")
                     .IsUnique();
 
@@ -429,7 +451,7 @@ namespace Server
                 entity.Property(e => e.TypeId)
                     .HasColumnName("type_id");
 
-                entity.Property(e => e.Type)
+                entity.Property(e => e.TypeName)
                     .IsRequired()
                     .HasColumnName("type")
                     .HasMaxLength(25)
@@ -437,7 +459,7 @@ namespace Server
 
                 // relationships
                 entity.HasMany<Membership>()
-                    .WithOne(membership => membership.Type)
+                    .WithOne(membership => membership.MemberType)
                     .HasForeignKey(membership => membership.TypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_member_type_assignment_type_id");
@@ -465,7 +487,7 @@ namespace Server
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_member_type_assignment_member_id");
 
-                entity.HasOne(membership => membership.Type)
+                entity.HasOne(membership => membership.MemberType)
                     .WithMany()
                     .HasForeignKey(membership => membership.TypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
