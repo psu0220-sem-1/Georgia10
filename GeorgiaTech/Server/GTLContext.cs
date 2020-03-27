@@ -76,26 +76,34 @@ namespace Server.Models
 
             modelBuilder.Entity<Address>(entity =>
             {
-                entity.Property(e => e.AddressId).HasColumnName("address_id");
+                entity.ToTable("address");
 
-                entity.Property(e => e.AdditionalInfo)
+                // key
+                entity.HasKey(address => address.AddressId);
+
+                // properties
+                entity.Property(address => address.AdditionalInfo)
+                    .IsRequired(false)
                     .HasColumnName("additional_info")
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Street)
+                entity.Property(address => address.Street)
                     .IsRequired()
                     .HasColumnName("street")
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Zip).HasColumnName("zip");
+                entity.Property(address => address.Zip)
+                    .HasColumnName("zip");
 
-                entity.HasOne(d => d.ZipNavigation)
-                    .WithMany(p => p.Address)
-                    .HasForeignKey(d => d.Zip)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                // relations
+                entity.HasOne(address => address.Zip)
+                    .WithMany() // don't set a navigational property on the zip side
+                    .HasForeignKey(address => address.ZipCode)
+                    .OnDelete(DeleteBehavior.ClientNoAction)
                     .HasConstraintName("FK_address_zip");
+
             });
 
             modelBuilder.Entity<Author>(entity =>
@@ -436,20 +444,28 @@ namespace Server.Models
 
             modelBuilder.Entity<ZipCode>(entity =>
             {
-                entity.HasKey(e => e.Zip)
-                    .HasName("PK__Zip_Code__30B369C4BB6ACBF8");
-
                 entity.ToTable("Zip_Code");
 
-                entity.Property(e => e.Zip)
+                // key
+                entity.HasKey(zip => zip.Code)
+                    .HasName("PK__Zip_Code__30B369C4BB6ACBF8");
+
+                // properties
+                entity.Property(zip => zip.Code)
                     .HasColumnName("zip")
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.City)
+                entity.Property(zip => zip.City)
                     .IsRequired()
                     .HasColumnName("city")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                // relationships
+                // don't set the zip to have a navigational property, like in address, but the inverse
+                entity.HasMany<Address>()
+                    .WithOne(address => address.Zip)
+                    .HasForeignKey(address => address.ZipCode);
             });
 
         }
