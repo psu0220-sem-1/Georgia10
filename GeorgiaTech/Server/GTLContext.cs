@@ -30,47 +30,63 @@ namespace Server
         {
             modelBuilder.Entity<Acquire>(entity =>
             {
-                entity.HasKey(e => e.MaterialId)
+                entity.ToTable("Acquire");
+
+                // key
+                entity.HasKey(acquire => acquire.MaterialId)
                     .HasName("PK__Acquire__6BFE1D288709E86E");
 
-                entity.Property(e => e.MaterialId)
+                // properties
+                entity.Property(acquire => acquire.MaterialId)
                     .HasColumnName("material_id")
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.AdditionalInfo)
+                entity.Property(acquire => acquire.AdditionalInfo)
                     .IsRequired()
                     .HasColumnName("additional_info")
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ReasonId).HasColumnName("reason_id");
+                entity.Property(acquire => acquire.ReasonId)
+                    .HasColumnName("reason_id");
 
-                entity.HasOne(d => d.Material)
-                    .WithOne(p => p.Acquire)
-                    .HasForeignKey<Acquire>(d => d.MaterialId)
+                // relationships
+                entity.HasOne(acquire => acquire.Material)
+                    .WithOne(material => material.Acquire)
+                    .HasForeignKey<Acquire>(acquire => acquire.MaterialId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_acquire_material_id");
 
-                entity.HasOne(d => d.Reason)
-                    .WithMany(p => p.Acquire)
-                    .HasForeignKey(d => d.ReasonId)
+                entity.HasOne(acquire => acquire.Reason)
+                    .WithMany()
+                    .HasForeignKey(acquire => acquire.ReasonId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_acquire_reason_id");
             });
 
             modelBuilder.Entity<AcquireReason>(entity =>
             {
-                entity.HasKey(e => e.ReasonId)
-                    .HasName("PK__Acquire___846BB554B66E8A55");
-
                 entity.ToTable("Acquire_Reason");
 
-                entity.Property(e => e.ReasonId).HasColumnName("reason_id");
+                // key
+                entity.HasKey(acquireReason => acquireReason.ReasonId)
+                    .HasName("PK__Acquire___846BB554B66E8A55");
 
-                entity.Property(e => e.Reason)
+                // properties
+                entity.Property(acquireReason => acquireReason.ReasonId)
+                    .HasColumnName("reason_id");
+
+                entity.Property(acquireReason => acquireReason.Reason)
                     .HasColumnName("reason")
                     .HasMaxLength(42)
                     .IsUnicode(false);
+
+                // relationships
+                entity.HasMany<Acquire>()
+                    .WithOne(acquire => acquire.Reason)
+                    .HasForeignKey(acquire => acquire.ReasonId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_acquire_reason_id");
             });
 
             modelBuilder.Entity<Address>(entity =>
@@ -271,6 +287,12 @@ namespace Server
                     .HasForeignKey(materialAuthor => materialAuthor.MaterialId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_material_authors_material_id");
+
+                entity.HasOne(material => material.Acquire)
+                    .WithOne(acquire => acquire.Material)
+                    .HasForeignKey<Acquire>(acquire => acquire.MaterialId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_acquire_material_id");
             });
 
             modelBuilder.Entity<MaterialAuthor>(entity =>

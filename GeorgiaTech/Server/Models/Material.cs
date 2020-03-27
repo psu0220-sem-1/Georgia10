@@ -23,8 +23,8 @@ namespace Server.Models
         public virtual MaterialType Type { get; set; }
         public virtual ICollection<MaterialSubjects> MaterialSubjects { get; set; }
         public virtual ICollection<MaterialAuthor> MaterialAuthors { get; set; }
-
         public virtual Acquire Acquire { get; set; }
+
         public virtual ICollection<Volume> Volume { get; set; }
     }
 }
