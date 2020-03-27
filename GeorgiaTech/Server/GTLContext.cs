@@ -1,8 +1,7 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
+using Server.Models;
 
-namespace Server.Models
+namespace Server
 {
     public partial class GTLContext : DbContext
     {
