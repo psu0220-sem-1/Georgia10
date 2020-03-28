@@ -53,6 +53,7 @@ namespace Server.Controllers
         {
             //should just look in the db for the given member, removing it.
             db.Members.Remove(t);
+            
             //returns number of changed rows. If it's zero, that means there wasn't a member with that information in the DB.
             return db.SaveChanges();
         }
@@ -80,9 +81,9 @@ namespace Server.Controllers
         public List<Member> FindAllByType(Membership t)
         {
             //lets sake for posterity that the TypeID on the Memberships field is the type. This will return the Member based on the type. 
-
+            //first i think i need to find the type enum from the DB.
+            List<Member>members = db.Members.
             throw new NotImplementedException();
-
         }
 
         public Member Insert(Member t)
@@ -103,7 +104,25 @@ namespace Server.Controllers
         }
         public Member Update(Member t)
         {
-            throw new NotImplementedException();
+            //Fairly certain this will first find the entity, then update the entity with the new data.
+            //Is likely quite slow, as context doesn't know what updated, so will update everything.
+            //Uses transactions in case anything goes wrong.
+            using (var transaction = db.Database.BeginTransaction())
+            {
+                try
+                {
+                    db.Update(t);
+                    db.SaveChanges();
+                    transaction.Commit();
+                }
+                catch (Exception e)
+                {
+                    //TODO: handle failure somehow.
+                    throw e;
+                }
+            }
+            //fairly certain this is useless. Would prefer returning int with amount of changed rows instead. 
+            return t;
         }
     }
 }
