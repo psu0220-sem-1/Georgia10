@@ -7,7 +7,8 @@ namespace Server.Controllers
 {
     public interface IMemberController : IController<Member>
     {
-        public void Create(string SSN, string fName, string lName, string homeAddress, string campusAddress, int zip, string homeAddressAdditionalInfo);
+        public void Create(string SSN, string fName, string lName, string homeAddress, string campusAddress, int zip, string homeAddressAdditionalInfo, List<MemberType> memberTypes);
+
 
 
     }

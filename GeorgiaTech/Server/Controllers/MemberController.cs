@@ -9,7 +9,7 @@ namespace Server.Controllers
     {
         static GTLContext db;
         IAddressController addressController = ControllerFactory.CreateAddressController(db);
-        
+
         public MemberController(GTLContext context)
         {
             db = context;
@@ -29,16 +29,32 @@ namespace Server.Controllers
                 //TODO when interface is set up.
                 Cards = null,
                 Loans = null,
-                
             };
-
-            throw new NotImplementedException();
+            //not sure if this will be the best implementation
+            member.Memberships = AddMembership(memberTypes, member);
         }
-        public void Delete(Member t)
+        private List<Membership> AddMembership(List<MemberType> memberTypes, Member member)
+        {
+            List<Membership> memberships = new List<Membership>();
+            foreach (var type in memberTypes)
+            {
+                Membership membership = new Membership
+                {
+                    MemberId = member.MemberId,
+                    TypeId = type.TypeId,
+                    Member = member,
+                    MemberType = type
+                };
+                memberships.Add(membership);
+            }
+            return memberships;
+        }
+        public int Delete(Member t)
         {
             //should just look in the db for the given member, removing it.
             db.Members.Remove(t);
-            db.SaveChanges();
+            //returns number of changed rows. If it's zero, that means there wasn't a member with that information in the DB.
+            return db.SaveChanges();
         }
         public List<MemberType> GetMemberTypes()
         {
@@ -52,25 +68,26 @@ namespace Server.Controllers
 
         public Member FindByID(int ID)
         {
-            
-            return db.Members.First(m => m.MemberId == ID);
+            //returns the given member if it exists, otherwise returns null.
+            return db.Members.FirstOrDefault(m => m.MemberId == ID);
         }
 
         public Member FindByType(Member t)
         {
-
             //Dont see why this would ever be used - unless parameter is changed to Membership.
             throw new NotImplementedException();
         }
         public List<Member> FindAllByType(Membership t)
         {
+            //lets sake for posterity that the TypeID on the Memberships field is the type. This will return the Member based on the type. 
+
             throw new NotImplementedException();
 
         }
 
         public Member Insert(Member t)
         {
-            
+
             db.Add(t);
             db.SaveChanges();
             //currently having it throw new implementationexception, as it should return an int and not an object. 
@@ -84,19 +101,7 @@ namespace Server.Controllers
             throw new NotImplementedException();
             //return chosen member based on parameter.
         }
-
-        public void Update(Member t)
-        {
-            throw new NotImplementedException();
-            //find chosen member. Update chosen member parameter. Update chosen member in database. 
-        }
-
-        int IController<Member>.Delete(Member t)
-        {
-            throw new NotImplementedException();
-        }
-
-        Member IController<Member>.Update(Member t)
+        public Member Update(Member t)
         {
             throw new NotImplementedException();
         }
