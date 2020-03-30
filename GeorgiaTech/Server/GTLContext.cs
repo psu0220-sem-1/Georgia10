@@ -109,9 +109,6 @@ namespace Server
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(address => address.Zip)
-                    .HasColumnName("zip");
-
                 // relations
                 // don't set a navigational property on the zip side
                 entity.HasOne(address => address.Zip)
