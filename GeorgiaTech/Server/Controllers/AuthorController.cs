@@ -7,11 +7,11 @@ namespace Server.Controllers
 {
     public class AuthorController: IAuthorController
     {
-        private readonly GTLContext _context;
+        private readonly GTLContext _db;
 
         public AuthorController(GTLContext context)
         {
-            _context = context;
+            _db = context;
         }
 
         /// <summary>
@@ -27,8 +27,8 @@ namespace Server.Controllers
                 throw new ArgumentNullException(nameof(author), "Author object can't be null");
             }
 
-            _context.Add(author);
-            _context.SaveChanges();
+            _db.Add(author);
+            _db.SaveChanges();
 
             return author;
         }
@@ -40,7 +40,7 @@ namespace Server.Controllers
         /// <returns>The found author entity or null</returns>
         public Author FindByID(int ID)
         {
-            var author = _context.Authors.Find(ID);
+            var author = _db.Authors.Find(ID);
             return author;
         }
 
@@ -51,7 +51,7 @@ namespace Server.Controllers
 
         public List<Author> FindAll()
         {
-            return _context.Authors.Where(a => true).ToList();
+            return _db.Authors.Where(a => true).ToList();
         }
 
         public Author Update(Author t)
