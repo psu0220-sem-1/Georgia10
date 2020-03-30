@@ -150,6 +150,8 @@ namespace Server
 
             modelBuilder.Entity<Author>(entity =>
             {
+                entity.ToTable("author");
+
                 // key
                 entity.HasKey(author => author.AuthorId);
 
