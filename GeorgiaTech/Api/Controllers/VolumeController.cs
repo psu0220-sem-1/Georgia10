@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Server.Models;
+using Server;
 using Api.Models;
 using Server.Controllers;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -28,6 +28,16 @@ namespace Api.Controllers
             return models;
 
         }
+        // GET: /volume
+        //[HttpGet]
+        //public string Get()
+        //{
+        //    var volumes = volumeController.FindAll();
+        //    //var models = volumes.Select(volume => BuildVolume(volume)).ToList();
+
+        //    return "test";
+
+        //}
 
         public Models.Volume BuildVolume(Server.Models.Volume volume)
         {
@@ -37,8 +47,8 @@ namespace Api.Controllers
                 AddressId = volume.HomeLocation.AddressId,
                 Street = volume.HomeLocation.Street,
                 AdditionalInfo = volume.HomeLocation.AdditionalInfo,
-                Zip = volume.HomeLocation.Zip,
-                City = volume.HomeLocation.ZipNavigation.City
+                Zip = volume.HomeLocation.ZipCode,
+                City = volume.HomeLocation.Zip.City
             };
 
             var currentAddress = new Models.Address
@@ -46,8 +56,8 @@ namespace Api.Controllers
                 AddressId = volume.CurrentLocation.AddressId,
                 Street = volume.CurrentLocation.Street,
                 AdditionalInfo = volume.CurrentLocation.AdditionalInfo,
-                Zip = volume.CurrentLocation.Zip,
-                City = volume.CurrentLocation.ZipNavigation.City
+                Zip = volume.CurrentLocation.ZipCode,
+                City = volume.CurrentLocation.Zip.City
             };
 
             var volumeMaterial = new Models.Material
@@ -57,17 +67,17 @@ namespace Api.Controllers
                 Language = volume.Material.Language,
                 Lendable = volume.Material.Lendable,
                 Description = volume.Material.Description,
-                Authors = volume.Material.MaterialAuthor.Select(e => new Models.Author
+                Authors = volume.Material.MaterialAuthors.Select(e => new Models.Author
                 {
-                    AuthorId = e.AuthorId,
+                    AuthorId = e.Author.AuthorId,
                     FirstName = e.Author.FirstName,
                     LastName = e.Author.LastName
                 })
                 .ToList(),
-                MaterialSubjects = volume.Material.MaterialSubjectAssignment.Select(e => new Models.MaterialSubject
+                MaterialSubjects = volume.Material.MaterialSubjects.Select(e => new Models.MaterialSubject
                 {
-                    SubjectId = e.SubjectId,
-                    Subject = e.Subject.Subject
+                    SubjectId = e.MaterialSubject.SubjectId,
+                    Subject = e.MaterialSubject.SubjectName
                 }).ToList()
             };
             var modelVolume = new Models.Volume
