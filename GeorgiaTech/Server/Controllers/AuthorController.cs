@@ -33,9 +33,15 @@ namespace Server.Controllers
             return author;
         }
 
+        /// <summary>
+        /// Finds an author entity by ID
+        /// </summary>
+        /// <param name="ID">The ID to query by</param>
+        /// <returns>The found author entity or null</returns>
         public Author FindByID(int ID)
         {
-            throw new System.NotImplementedException();
+            var author = _context.Authors.Find(ID);
+            return author;
         }
 
         public Author FindByType(Author t)

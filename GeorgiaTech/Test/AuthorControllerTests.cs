@@ -137,5 +137,51 @@ namespace Test
             Assert.Throws<ArgumentNullException>(() => authorController.Insert(null));
             Assert.AreEqual(0, context.Authors.Count());
         }
+
+        [Test]
+        public void AuthorControllerFindByIdFindsAnExistingAuthor()
+        {
+            const string firstName = "Nikola";
+            const string lastName = "Velichkov";
+
+            var options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase("AuthorControllerFindByIdFindsAnExistingAuthor")
+                .Options;
+
+            using var context = new GTLContext(options);
+            var authorController = ControllerFactory.CreateAuthorController(context);
+            var insertedAuthor = authorController.Create(firstName, lastName);
+            Assert.NotNull(insertedAuthor);
+            authorController.Insert(insertedAuthor);
+
+            var author = authorController.FindByID(insertedAuthor.AuthorId);
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(author);
+                Assert.AreEqual(insertedAuthor.AuthorId, author.AuthorId);
+                Assert.AreEqual(firstName, author.FirstName);
+                Assert.AreEqual(lastName, author.LastName);
+            });
+        }
+
+        [Test]
+        public void AuthorControllerFindByIdDoesNotFindAnExistingAuthor()
+        {
+            const string firstName = "Nikola";
+            const string lastName = "Velichkov";
+
+            var options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase("AuthorControllerFindByIdDoesNotFindAnExistingAuthor")
+                .Options;
+
+            using var context = new GTLContext(options);
+            var authorController = ControllerFactory.CreateAuthorController(context);
+            // create an author to use their ID (incremented) to be sure to try to get a non existing entity
+            var insertedAuthor = authorController.Create(firstName, lastName);
+            authorController.Insert(insertedAuthor);
+
+            var author = authorController.FindByID(insertedAuthor.AuthorId + 1);
+            Assert.IsNull(author);
+        }
     }
 }
