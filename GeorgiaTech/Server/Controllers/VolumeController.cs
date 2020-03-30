@@ -38,34 +38,35 @@ namespace Server.Controllers
 
         public List<Volume> FindAll()
         {
-            IQueryable<Volume> volumes = _context.Volume
+            IQueryable<Volume> volumes = _context.Volumes
                 .Include(v => v.Material)
-                    .ThenInclude(m => m.MaterialAuthor)
+                    .ThenInclude(m => m.MaterialAuthors)
                         .ThenInclude(ma => ma.Author)
                 .Include(v => v.Material)
-                    .ThenInclude(m => m.MaterialSubjectAssignment)
-                        .ThenInclude(ms => ms.Subject)
+                    .ThenInclude(m => m.MaterialSubjects)
+                        .ThenInclude(ms => ms.MaterialSubject)
                 .Include(v => v.HomeLocation)
-                    .ThenInclude(a => a.ZipNavigation)
+                    .ThenInclude(a => a.Zip)
                 .Include(v => v.CurrentLocation)
-                    .ThenInclude(a => a.ZipNavigation);
+                    .ThenInclude(a => a.Zip);
 
             return volumes.ToList();
         }
 
         public Volume FindByID(int ID)
         {
-            var volume = _context.Volume
+            var volume = _context.Volumes
                 .Include(v => v.Material)
-                    .ThenInclude(m => m.MaterialAuthor)
+                    .ThenInclude(m => m.MaterialAuthors)
                         .ThenInclude(ma => ma.Author)
                 .Include(v => v.Material)
-                    .ThenInclude(m => m.MaterialSubjectAssignment)
-                        .ThenInclude(ms => ms.Subject)
+                    .ThenInclude(m => m.MaterialSubjects)
+                        .ThenInclude(ms => ms.MaterialSubject)
                 .Include(v => v.HomeLocation)
-                    .ThenInclude(a => a.ZipNavigation)
+                    .ThenInclude(a => a.Zip)
                 .Include(v => v.CurrentLocation)
-                    .ThenInclude(a => a.ZipNavigation).Single(v => v.VolumeId == ID);
+                    .ThenInclude(a => a.Zip)
+                 .Single(v => v.VolumeId == ID);
 
             return volume;
         }
@@ -77,7 +78,7 @@ namespace Server.Controllers
 
         public Volume Insert(Volume volume)
         {
-            _context.Volume.Add(volume);
+            _context.Volumes.Add(volume);
             _context.SaveChanges();
             return volume;
         }
