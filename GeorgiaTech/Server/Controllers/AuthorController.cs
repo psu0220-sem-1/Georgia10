@@ -49,9 +49,14 @@ namespace Server.Controllers
             throw new System.NotImplementedException();
         }
 
+        /// <summary>
+        /// Fetches all authors that exist on the database
+        /// </summary>
+        /// <returns>A list of all authors on the database</returns>
+        /// <remarks>NOT TESTED</remarks>
         public List<Author> FindAll()
         {
-            return _db.Authors.Where(a => true).ToList();
+            return _db.Authors.ToList();
         }
 
         public Author Update(Author t)
