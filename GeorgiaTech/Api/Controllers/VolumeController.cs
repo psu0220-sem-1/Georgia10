@@ -142,6 +142,7 @@ namespace Api.Controllers
             try
             {
                 var newVolume = volumeController.Create(materialID: volume.MaterialId, currentLocationID: volume.CurrentLocationId, homeLocationID: volume.HomeLocationId);
+                volumeController.Insert(newVolume);
                 var modelVolume = BuildVolume(newVolume);
                 return Ok(modelVolume);
 

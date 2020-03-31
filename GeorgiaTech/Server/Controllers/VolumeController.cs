@@ -15,7 +15,7 @@ namespace Server.Controllers
         public VolumeController(GTLContext context)
         {
             materialController = new MaterialController();
-            addressController = new AddressController();
+            addressController = new AddressController(context);
             _context = context;
 
         }
@@ -29,9 +29,8 @@ namespace Server.Controllers
                 var homeLocation = addressController.FindByID(homeLocationID);
                 var currentLocation = addressController.FindByID(currentLocationID);
 
-                var volume = new Volume { Material = material, CurrentLocation = currentLocation, HomeLocation = homeLocation };
-                Insert(volume);
-                return FindByID(ID: volume.VolumeId);
+                var newVolume = new Volume { Material = material, CurrentLocation = currentLocation, HomeLocation = homeLocation };
+                return newVolume;
             }
             catch (Exception ex)
             {
