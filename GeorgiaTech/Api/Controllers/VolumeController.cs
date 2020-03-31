@@ -20,89 +20,136 @@ namespace Api.Controllers
         }
         // GET: /volume
         [HttpGet]
-        public List<Models.Volume> Get()
+        public IActionResult Get(int materialId)
         {
-            var volumes = volumeController.FindAll();
-            var models = volumes.Select(volume => BuildVolume(volume)).ToList();
+            Console.WriteLine(materialId);
+            try
+            {
+                List<Server.Models.Volume> volumes; ;
+                if (materialId > 0)
+                {
+                    volumes = volumeController.FindVolumesForMaterial(materialId);
 
-            return models;
+                } else
+                {
+                    volumes = volumeController.FindAll();
+                }
+                var volumeModels = volumes.Select(volume => BuildVolume(volume)).ToList();
+                return Ok(volumeModels);
 
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+          
         }
-        // GET: /volume
-        //[HttpGet]
-        //public string Get()
-        //{
-        //    var volumes = volumeController.FindAll();
-        //    //var models = volumes.Select(volume => BuildVolume(volume)).ToList();
-
-        //    return "test";
-
-        //}
 
         public Models.Volume BuildVolume(Server.Models.Volume volume)
         {
+            var modelVolume = new Volume();
+            modelVolume.VolumeId = volume.VolumeId;
 
-            var homeAddress = new Models.Address
+            if (volume.HomeLocation != null)
             {
-                AddressId = volume.HomeLocation.AddressId,
-                Street = volume.HomeLocation.Street,
-                AdditionalInfo = volume.HomeLocation.AdditionalInfo,
-                Zip = volume.HomeLocation.ZipCode,
-                City = volume.HomeLocation.Zip.City
-            };
-
-            var currentAddress = new Models.Address
-            {
-                AddressId = volume.CurrentLocation.AddressId,
-                Street = volume.CurrentLocation.Street,
-                AdditionalInfo = volume.CurrentLocation.AdditionalInfo,
-                Zip = volume.CurrentLocation.ZipCode,
-                City = volume.CurrentLocation.Zip.City
-            };
-
-            var volumeMaterial = new Models.Material
-            {
-                MaterialId = volume.MaterialId,
-                Isbn = volume.Material.Isbn,
-                Language = volume.Material.Language,
-                Lendable = volume.Material.Lendable,
-                Description = volume.Material.Description,
-                Authors = volume.Material.MaterialAuthors.Select(e => new Models.Author
+                var homeAddress = new Models.Address
                 {
-                    AuthorId = e.Author.AuthorId,
-                    FirstName = e.Author.FirstName,
-                    LastName = e.Author.LastName
-                })
-                .ToList(),
-                MaterialSubjects = volume.Material.MaterialSubjects.Select(e => new Models.MaterialSubject
-                {
-                    SubjectId = e.MaterialSubject.SubjectId,
-                    Subject = e.MaterialSubject.SubjectName
-                }).ToList()
-            };
-            var modelVolume = new Models.Volume
+                    AddressId = volume.HomeLocation.AddressId,
+                    Street = volume.HomeLocation.Street,
+                    AdditionalInfo = volume.HomeLocation.AdditionalInfo,
+                    Zip = volume.HomeLocation.ZipCode,
+                    City = volume.HomeLocation.Zip.City
+                };
+                modelVolume.HomeLocation = homeAddress;
+                modelVolume.HomeLocationId = volume.HomeLocationId;
+            }
+       
+            if (volume.CurrentLocation != null)
             {
-                VolumeId = volume.VolumeId,
-                HomeLocation = homeAddress,
-                CurrentLocation = currentAddress,
-                Material = volumeMaterial
-            };
+                var currentAddress = new Models.Address
+                {
+                    AddressId = volume.CurrentLocation.AddressId,
+                    Street = volume.CurrentLocation.Street,
+                    AdditionalInfo = volume.CurrentLocation.AdditionalInfo,
+                    Zip = volume.CurrentLocation.ZipCode,
+                    City = volume.CurrentLocation.Zip.City
+                };
+                modelVolume.CurrentLocation = currentAddress;
+                modelVolume.CurrentLocationId = volume.CurrentLocationId;
+            }
+         
+            if (volume.Material != null)
+            {
+                var volumeMaterial = new Models.Material
+                {
+                    MaterialId = volume.MaterialId,
+                    Isbn = volume.Material.Isbn,
+                    Language = volume.Material.Language,
+                    Lendable = volume.Material.Lendable,
+                    Description = volume.Material.Description,
+                   
+                };
+                if (volume.Material.MaterialAuthors != null)
+                {
+                    var authors = volume.Material.MaterialAuthors.Select(e => new Models.Author
+                    {
+                        AuthorId = e.Author.AuthorId,
+                        FirstName = e.Author.FirstName,
+                        LastName = e.Author.LastName
+                    }).ToList();
+                    volumeMaterial.Authors = authors;
+          
+                }
+                if (volume.Material.MaterialSubjects != null)
+                {
+                    var materialSubjects = volume.Material.MaterialSubjects.Select(e => new Models.MaterialSubject
+                    {
+                        SubjectId = e.MaterialSubject.SubjectId,
+                        Subject = e.MaterialSubject.SubjectName
+                    }).ToList();
+                    volumeMaterial.MaterialSubjects = materialSubjects;
+                }
+                modelVolume.Material = volumeMaterial;
+                modelVolume.MaterialId = volume.MaterialId;
+              
+            }
+         
+         
             return modelVolume;
         }
 
-        // GET api/values/5
+        // GET /volume/1
         [HttpGet("{id}")]
-        public Models.Volume Get(int id)
+        public IActionResult GetById(int id)
         {
-            var volume = volumeController.FindByID(id);
-            var volumeModel = BuildVolume(volume);
-            return volumeModel;
+            try
+            {
+                var volume = volumeController.FindByID(id);
+                var volumeModel = BuildVolume(volume);
+                return Ok(volumeModel);
+            }
+            catch (Exception ex)
+            {
+               return NotFound(ex.Message);
+            }
+        
         }
 
-        // POST api/values
+        // POST /volume
         [HttpPost]
-        public void Post([FromBody]string value)
+        public IActionResult Post([FromBody] Volume volume)
         {
+            try
+            {
+                var newVolume = volumeController.Create(materialID: volume.MaterialId, currentLocationID: volume.CurrentLocationId, homeLocationID: volume.HomeLocationId);
+                var modelVolume = BuildVolume(newVolume);
+                return Ok(modelVolume);
+
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         // PUT api/values/5
