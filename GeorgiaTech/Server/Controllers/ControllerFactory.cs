@@ -7,9 +7,9 @@ namespace Server.Controllers
     {
         public static IAddressController CreateAddressController(GTLContext context)
         {
-            return new AddressController();
+            return new AddressController(context);
         }
-        
+
         public static IAuthorController CreateAuthorController(GTLContext context)
         {
             return new AuthorController(context);
@@ -21,7 +21,7 @@ namespace Server.Controllers
             return new LoanController();
         }
         */
-            
+
         public static IMaterialController CreateMaterialController(GTLContext context)
         {
             return new MaterialController();

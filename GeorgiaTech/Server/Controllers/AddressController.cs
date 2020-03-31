@@ -5,6 +5,13 @@ namespace Server.Controllers
 {
     public class AddressController: IAddressController
     {
+        private readonly GTLContext _db;
+
+        public AddressController(GTLContext context)
+        {
+            _db = context;
+        }
+
         public Address Insert(Address t)
         {
             throw new System.NotImplementedException();
