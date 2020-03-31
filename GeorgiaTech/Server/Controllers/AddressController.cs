@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using Server.Models;
 
 namespace Server.Controllers
@@ -19,9 +20,14 @@ namespace Server.Controllers
             throw new System.NotImplementedException();
         }
 
+        /// <summary>
+        /// Finds an address by its ID. If no address is found, null is returned
+        /// </summary>
+        /// <param name="ID">The ID of the address</param>
+        /// <returns>The found address or null</returns>
         public Address FindByID(int ID)
         {
-            throw new System.NotImplementedException();
+            return _db.Addresses.Find(ID);
         }
 
         public Address FindByType(Address t)

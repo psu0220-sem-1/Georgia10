@@ -110,5 +110,78 @@ namespace Test
             Assert.Throws<ArgumentException>(() =>
                 addressController.Create(street, additionalInfo, zipCode));
         }
+
+        [Test]
+        public void FindByIdFindsAnAddressInstance()
+        {
+            const string street = "Spobjervej 26";
+            const string additionalInfo = "1.4";
+            const int zipCode = 8000;
+            const string city = "Aarhus";
+
+
+            var options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase("FindByIdFindsAnAddressInstance")
+                .Options;
+
+            using var context = new GTLContext(options);
+            var addressController = ControllerFactory.CreateAddressController(context);
+
+            // insert zip code
+            context.ZipCodes.Add(new ZipCode {Code = zipCode, City = city});
+            // insert address
+            var insertedAddress = context.Addresses.Add(new Address
+            {
+                AdditionalInfo = additionalInfo,
+                Street = street,
+                ZipCode = zipCode,
+            });
+            context.SaveChanges();
+
+            var address = addressController.FindByID(insertedAddress.Entity.AddressId);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsNotNull(address);
+                Assert.AreEqual(street, address.Street);
+                Assert.AreEqual(additionalInfo, address.AdditionalInfo);
+
+                Assert.IsNotNull(address.Zip);
+                Assert.AreEqual(zipCode, address.Zip.Code);
+                Assert.AreEqual(city, address.Zip.City);
+            });
+        }
+
+        [Test]
+        public void FindByIdDoesNotFindAnInstance()
+        {
+            const string street = "Spobjervej 26";
+            const string additionalInfo = "1.4";
+            const int zipCode = 8000;
+            const string city = "Aarhus";
+
+
+            var options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase("FindByIdDoesNotFindAnInstance")
+                .Options;
+
+            using var context = new GTLContext(options);
+            var addressController = ControllerFactory.CreateAddressController(context);
+
+            // insert zip code
+            context.ZipCodes.Add(new ZipCode {Code = zipCode, City = city});
+            // insert address
+            var insertedAddress = context.Addresses.Add(new Address
+            {
+                AdditionalInfo = additionalInfo,
+                Street = street,
+                ZipCode = zipCode,
+            });
+            context.SaveChanges();
+
+            // find an entity with an incremented ID (make sure there doesn't exist such an entity)
+            var address = addressController.FindByID(insertedAddress.Entity.AddressId + 1);
+            Assert.IsNull(address);
+        }
     }
 }
