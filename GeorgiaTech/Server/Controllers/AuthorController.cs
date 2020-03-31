@@ -44,6 +44,7 @@ namespace Server.Controllers
             return author;
         }
 
+        [Obsolete]
         public Author FindByType(Author t)
         {
             throw new System.NotImplementedException();
