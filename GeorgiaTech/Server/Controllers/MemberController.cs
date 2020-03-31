@@ -5,7 +5,7 @@ using Server.Models;
 using System.Linq;
 namespace Server.Controllers
 {
-    class MemberController : IMemberController
+    public class MemberController : IMemberController
     {
         static GTLContext db;
         IAddressController addressController = ControllerFactory.CreateAddressController(db);
@@ -15,7 +15,7 @@ namespace Server.Controllers
             db = context;
         }
 
-        public void Create(string SSN, string fName, string lName, string homeAddress, string campusAddress, int zip, string homeAddressAdditionalInfo, List<MemberType> memberTypes)
+        public Member Create(string SSN, string fName, string lName, string homeAddress, string campusAddress, int zip, string homeAddressAdditionalInfo, List<MemberType> memberTypes)
         {
             Member member = new Member
             {
@@ -32,6 +32,7 @@ namespace Server.Controllers
             };
             //not sure if this will be the best implementation
             member.Memberships = AddMembership(memberTypes, member);
+            return member;
         }
         private List<Membership> AddMembership(List<MemberType> memberTypes, Member member)
         {
@@ -53,7 +54,7 @@ namespace Server.Controllers
         {
             //should just look in the db for the given member, removing it.
             db.Members.Remove(t);
-            
+
             //returns number of changed rows. If it's zero, that means there wasn't a member with that information in the DB.
             return db.SaveChanges();
         }
@@ -72,47 +73,49 @@ namespace Server.Controllers
             //returns the given member if it exists, otherwise returns null.
             return db.Members.FirstOrDefault(m => m.MemberId == ID);
         }
-
+        [Obsolete ("use FindAllByType that returns a list")]
         public Member FindByType(Member t)
         {
-            //Dont see why this would ever be used - unless parameter is changed to Membership.
             throw new NotImplementedException();
         }
-        public List<Member> FindAllByType(Membership t)
+        public List<Member> FindAllByType(Member t)
         {
             //lets sake for posterity that the TypeID on the Memberships field is the type. This will return the Member based on the type. 
             //first i think i need to find the type enum from the DB.
-            List<Member>members = db.Members.
-            throw new NotImplementedException();
+            List<Member> members = new List<Member>();
+            foreach (var type in t.Memberships)
+            {
+                int typeID = type.TypeId;
+                List<Member> membersList = db.Members.Where(x => x.Memberships.Any(y => y.TypeId == typeID)).ToList();
+                members.AddRange(membersList);
+            }
+            return members;
         }
 
-        public Member Insert(Member t)
+        public int Insert(Member t)
         {
 
             db.Add(t);
-            db.SaveChanges();
-            //currently having it throw new implementationexception, as it should return an int and not an object. 
-            throw new NotImplementedException();
-
-
+            return db.SaveChanges();
         }
 
-        public void Read(Member t)
+        [Obsolete("Use Update that returns int instead")]
+        public Member Update(Member member)
         {
             throw new NotImplementedException();
-            //return chosen member based on parameter.
         }
-        public Member Update(Member t)
+        public int Update(Member member)
         {
             //Fairly certain this will first find the entity, then update the entity with the new data.
             //Is likely quite slow, as context doesn't know what updated, so will update everything.
             //Uses transactions in case anything goes wrong.
+            int changes = 0;
             using (var transaction = db.Database.BeginTransaction())
             {
                 try
                 {
-                    db.Update(t);
-                    db.SaveChanges();
+                    db.Update(member);
+                    changes = db.SaveChanges();
                     transaction.Commit();
                 }
                 catch (Exception e)
@@ -122,7 +125,7 @@ namespace Server.Controllers
                 }
             }
             //fairly certain this is useless. Would prefer returning int with amount of changed rows instead. 
-            return t;
+            return changes;
         }
     }
 }
