@@ -24,7 +24,7 @@ namespace Server.Controllers
             
         public static IMaterialController CreateMaterialController(GTLContext context)
         {
-            return new MaterialController();
+            return new MaterialController(context);
         }
 
         public static IMemberController CreateMemberController(GTLContext context)
