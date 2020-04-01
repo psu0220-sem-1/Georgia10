@@ -8,14 +8,14 @@ namespace Server.Controllers
 {
     public class VolumeController: IVolumeController
     {
-        private MaterialController materialController;
-        private AddressController addressController;
+        private IMaterialController materialController;
+        private IAddressController addressController;
         private readonly GTLContext _context;
 
         public VolumeController(GTLContext context)
         {
-            materialController = new MaterialController();
-            addressController = new AddressController(context);
+            materialController = ControllerFactory.CreateMaterialController(context);
+            addressController = ControllerFactory.CreateAddressController(context);
             _context = context;
 
         }
