@@ -99,12 +99,12 @@ namespace Server.Controllers
             return db.SaveChanges();
         }
 
-        [Obsolete("Use Update that returns int instead")]
+        [Obsolete("Use UpdateMember that returns int instead")]
         public Member Update(Member member)
         {
             throw new NotImplementedException();
         }
-        public int Update(Member member)
+        public int UpdateMember(Member member)
         {
             //Fairly certain this will first find the entity, then update the entity with the new data.
             //Is likely quite slow, as context doesn't know what updated, so will update everything.
