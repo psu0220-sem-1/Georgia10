@@ -60,9 +60,21 @@ namespace Server.Controllers
             return _db.Authors.ToList();
         }
 
-        public Author Update(Author t)
+        /// <summary>
+        /// Saves any changes made to the context's entities. If no changes are made before the method call
+        /// the method won't do any operations and return null signifying such.
+        /// </summary>
+        /// <param name="author">An author instance that has been changed</param>
+        /// <returns>The author instance passed if changes are saved, null otherwise</returns>
+        public Author Update(Author author)
         {
-            throw new System.NotImplementedException();
+            if (!_db.ChangeTracker.HasChanges())
+            {
+                return null;
+            }
+
+            _db.SaveChanges();
+            return author;
         }
 
         public int Delete(Author t)
