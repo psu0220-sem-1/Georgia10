@@ -11,13 +11,13 @@ namespace Test
     public class AuthorControllerTests
     {
         [Test]
-        public void AuthorControllerCreateCreatesCorrectAuthorInstance()
+        public void CreateCreatesCorrectAuthorInstance()
         {
             const string firstName = "Nikola";
             const string lastName = "Velichkov";
 
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("AuthorControllerCreateCreatesCorrectAuthorInstance")
+                .UseInMemoryDatabase("CreateCreatesCorrectAuthorInstance")
                 .Options;
 
             using var context = new GTLContext(options);
@@ -31,14 +31,14 @@ namespace Test
         }
 
         [Test]
-        public void AuthorControllerCreateThrowsArgumentExceptionWithFirstNameLongerThan50()
+        public void CreateThrowsArgumentOutOfRangeExceptionWithFirstNameLongerThan50()
         {
             const string firstName = "123456789012345678901234567890123456789012345678901";
             const string lastName = "Velichkov";
             Assert.IsTrue(firstName.Length > 50);
 
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("AuthorControllerCreateThrowsArgumentExceptionWithFirstNameLongerThan50")
+                .UseInMemoryDatabase("CreateThrowsArgumentOutOfRangeExceptionWithFirstNameLongerThan50")
                 .Options;
 
             using var context = new GTLContext(options);
@@ -48,13 +48,13 @@ namespace Test
 
 
         [Test]
-        public void AuthorControllerCreateThrowsArgumentExceptionWithEmptyFirstNameArgument()
+        public void CreateThrowsArgumentExceptionWithEmptyFirstNameArgument()
         {
             const string firstName = "";
             const string lastName = "Velichkov";
 
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("AuthorControllerCreateThrowsArgumentExceptionWithEmptyFirstNameArgument")
+                .UseInMemoryDatabase("CreateThrowsArgumentExceptionWithEmptyFirstNameArgument")
                 .Options;
 
             using var context = new GTLContext(options);
@@ -63,14 +63,14 @@ namespace Test
         }
 
         [Test]
-        public void AuthorControllerCreateThrowsArgumentExceptionWithLastNameLongerThan50()
+        public void CreateThrowsArgumentOutOfRangeExceptionWithLastNameLongerThan50()
         {
             const string firstName = "Nikola";
             const string lastName = "123456789012345678901234567890123456789012345678901";
             Assert.IsTrue(lastName.Length > 50);
 
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("AuthorControllerCreateThrowsArgumentExceptionWithLastNameLongerThan50")
+                .UseInMemoryDatabase("CreateThrowsArgumentOutOfRangeExceptionWithLastNameLongerThan50")
                 .Options;
 
             using var context = new GTLContext(options);
@@ -79,13 +79,13 @@ namespace Test
         }
 
         [Test]
-        public void AuthorControllerCreateThrowsArgumentExceptionWithEmptyLastNameArgument()
+        public void CreateThrowsArgumentExceptionWithEmptyLastNameArgument()
         {
             const string firstName = "Nikola";
             const string lastName = "";
 
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("AuthorControllerCreateThrowsArgumentExceptionWithEmptyLastNameArgument")
+                .UseInMemoryDatabase("CreateThrowsArgumentExceptionWithEmptyLastNameArgument")
                 .Options;
 
             using var context = new GTLContext(options);
@@ -95,13 +95,13 @@ namespace Test
         }
 
         [Test]
-        public void AuthorControllerInsertInsertsCorrectly()
+        public void InsertInsertsCorrectly()
         {
             const string firstName = "Nikola";
             const string lastName = "Velichkov";
 
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("AuthorControllerInsertInsertsCorrectly")
+                .UseInMemoryDatabase("InsertInsertsCorrectly")
                 .Options;
 
             using var context = new GTLContext(options);
@@ -125,10 +125,10 @@ namespace Test
         }
 
         [Test]
-        public void AuthorControllerInsertThrowsArgumentNullExceptionWithNullAuthorParam()
+        public void InsertThrowsArgumentNullExceptionWithNullAuthorParam()
         {
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("AuthorControllerInsertThrowsArgumentNullExceptionWithNullAuthorParam")
+                .UseInMemoryDatabase("InsertThrowsArgumentNullExceptionWithNullAuthorParam")
                 .Options;
 
             using var context = new GTLContext(options);
@@ -139,13 +139,13 @@ namespace Test
         }
 
         [Test]
-        public void AuthorControllerFindByIdFindsAnExistingAuthor()
+        public void FindByIdFindsAnExistingAuthor()
         {
             const string firstName = "Nikola";
             const string lastName = "Velichkov";
 
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("AuthorControllerFindByIdFindsAnExistingAuthor")
+                .UseInMemoryDatabase("FindByIdFindsAnExistingAuthor")
                 .Options;
 
             using var context = new GTLContext(options);
@@ -165,13 +165,13 @@ namespace Test
         }
 
         [Test]
-        public void AuthorControllerFindByIdDoesNotFindAnExistingAuthor()
+        public void FindByIdDoesNotFindANonExistingAuthor()
         {
             const string firstName = "Nikola";
             const string lastName = "Velichkov";
 
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("AuthorControllerFindByIdDoesNotFindAnExistingAuthor")
+                .UseInMemoryDatabase("FindByIdDoesNotFindANonExistingAuthor")
                 .Options;
 
             using var context = new GTLContext(options);
