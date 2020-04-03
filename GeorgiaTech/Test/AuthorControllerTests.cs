@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -182,6 +183,299 @@ namespace Test
 
             var author = authorController.FindByID(insertedAuthor.AuthorId + 1);
             Assert.IsNull(author);
+        }
+
+        [Test]
+        public void FindMaterialsFetchesMaterialsWithASingleAuthor()
+        {
+            var options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase("FindMaterialsFetchesMaterialsWithASingleAuthor")
+                .UseLazyLoadingProxies()
+                .Options;
+
+            // setup
+            const string materialOneTitle = "Pragmatic Programmer special 2nd";
+            const string materialTwoTitle = "Clean Code: A Handbook of Agile Software Craftsmanship";
+            const string materialThreeTitle = "Elon Musk: Tesla, SpaceX, and the Quest for a Fantastic Future";
+
+            var insertedAuthor = new Author
+            {
+                FirstName = "Nikola",
+                LastName = "Velichkov",
+            };
+
+            var insertedMaterials = new List<Material>
+            {
+                new Material
+                {
+                    Isbn = "9780135957059",
+                    Title = materialOneTitle,
+                    Language = "English",
+                    Lendable = true,
+                    Description = "Some description here",
+                },
+                new Material
+                {
+                    Isbn = "9780132350884",
+                    Title = materialTwoTitle,
+                    Language = "English",
+                    Lendable = true,
+                    Description = "Some description here",
+                },
+                new Material
+                {
+                    Isbn = "9780062301253",
+                    Title = materialThreeTitle,
+                    Language = "English",
+                    Lendable = true,
+                    Description = "Some description here",
+                },
+            };
+
+            // add authors to materials
+            insertedMaterials.ForEach(material =>
+            {
+                material.MaterialAuthors = new List<MaterialAuthor>
+                {
+                    new MaterialAuthor
+                    {
+                        Author = insertedAuthor,
+                        Material = material,
+                    }
+                };
+            });
+
+            using (var context = new GTLContext(options))
+            {
+                context.AddRange(insertedMaterials);
+                context.SaveChanges();
+            }
+
+            // action
+            using (var context = new GTLContext(options))
+            {
+                var authorController = ControllerFactory.CreateAuthorController(context);
+                var author = context.Authors.FirstOrDefault(a => a.FirstName == insertedAuthor.FirstName);
+                Assert.IsNotNull(author);
+
+                var materials = authorController.FindMaterials(author);
+
+                // assert materials
+                Assert.Multiple(() =>
+                {
+                    Assert.IsNotNull(materials);
+                    Assert.AreEqual(3, materials.Count);
+                    Assert.IsTrue(materials.Any(m => m.Title == materialOneTitle));
+                    Assert.IsTrue(materials.Any(m => m.Title == materialTwoTitle));
+                    Assert.IsTrue(materials.Any(m => m.Title == materialThreeTitle));
+                });
+
+                // assert material authors
+                materials.ForEach(material =>
+                {
+                    Assert.Multiple(() =>
+                    {
+                        Assert.AreEqual(1, material.MaterialAuthors.Count);
+                        Assert.IsNotNull(material.MaterialAuthors.FirstOrDefault(ma =>
+                            ma.Author.FirstName == insertedAuthor.FirstName && ma.Author.LastName == insertedAuthor.LastName));
+                    });
+                });
+            }
+        }
+
+        [Test]
+        public void FindMaterialsFetchesMaterialsWithMultipleAuthors()
+        {
+            var options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase("FindMaterialsFetchesMaterialsWithMultipleAuthors")
+                .UseLazyLoadingProxies()
+                .Options;
+
+            // setup
+            const string materialOneTitle = "Pragmatic Programmer special 2nd";
+            const string materialTwoTitle = "Clean Code: A Handbook of Agile Software Craftsmanship";
+            const string materialThreeTitle = "Elon Musk: Tesla, SpaceX, and the Quest for a Fantastic Future";
+
+            var insertedAuthor = new Author
+            {
+                FirstName = "Nikola",
+                LastName = "Velichkov",
+            };
+
+            var insertedAuthorTwo = new Author
+            {
+                FirstName = "Gergana",
+                LastName = "Petkova",
+            };
+
+            var insertedMaterials = new List<Material>
+            {
+                new Material
+                {
+                    Isbn = "9780135957059",
+                    Title = materialOneTitle,
+                    Language = "English",
+                    Lendable = true,
+                    Description = "Some description here",
+                },
+                new Material
+                {
+                    Isbn = "9780132350884",
+                    Title = materialTwoTitle,
+                    Language = "English",
+                    Lendable = true,
+                    Description = "Some description here",
+                },
+                new Material
+                {
+                    Isbn = "9780062301253",
+                    Title = materialThreeTitle,
+                    Language = "English",
+                    Lendable = true,
+                    Description = "Some description here",
+                },
+            };
+
+            // add authors to materials
+            insertedMaterials.ForEach(material =>
+            {
+                material.MaterialAuthors = new List<MaterialAuthor>
+                {
+                    new MaterialAuthor
+                    {
+                        Author = insertedAuthor,
+                        Material = material,
+                    },
+                    new MaterialAuthor
+                    {
+                        Author = insertedAuthorTwo,
+                        Material = material,
+                    }
+                };
+            });
+
+            using (var context = new GTLContext(options))
+            {
+                context.AddRange(insertedMaterials);
+                context.SaveChanges();
+            }
+
+            using (var context = new GTLContext(options))
+            {
+                var authorController = ControllerFactory.CreateAuthorController(context);
+                var author = context.Authors.FirstOrDefault(a => a.FirstName == insertedAuthor.FirstName);
+                Assert.IsNotNull(author);
+
+                var materials = authorController.FindMaterials(author);
+
+                // assert materials
+                Assert.Multiple(() =>
+                {
+                    Assert.IsNotNull(materials);
+                    Assert.AreEqual(3, materials.Count);
+                    Assert.IsTrue(materials.Any(m => m.Title == materialOneTitle));
+                    Assert.IsTrue(materials.Any(m => m.Title == materialTwoTitle));
+                    Assert.IsTrue(materials.Any(m => m.Title == materialThreeTitle));
+                });
+
+                // assert material authors
+                materials.ForEach(material =>
+                {
+                    Assert.Multiple(() =>
+                    {
+                        Assert.AreEqual(2, material.MaterialAuthors.Count);
+                        Assert.IsNotNull(material.MaterialAuthors.FirstOrDefault(ma =>
+                            ma.Author.FirstName == insertedAuthor.FirstName && ma.Author.LastName == insertedAuthor.LastName));
+                    });
+                });
+            }
+        }
+
+        [Test]
+        public void FindMaterialsDoesNotFetchAnyMaterialsWithOneAuthorAndZeroMaterials()
+        {
+            var options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase("FindMaterialsDoesNotFetchAnyMaterialsWithOneAuthorAndZeroMaterials")
+                .UseLazyLoadingProxies()
+                .Options;
+
+            // setup
+            const string materialOneTitle = "Pragmatic Programmer special 2nd";
+            const string materialTwoTitle = "Clean Code: A Handbook of Agile Software Craftsmanship";
+            const string materialThreeTitle = "Elon Musk: Tesla, SpaceX, and the Quest for a Fantastic Future";
+
+            var insertedAuthor = new Author
+            {
+                FirstName = "Nikola",
+                LastName = "Velichkov",
+            };
+
+            var insertedAuthorTwo = new Author
+            {
+                FirstName = "Gergana",
+                LastName = "Petkova",
+            };
+
+            var insertedMaterials = new List<Material>
+            {
+                new Material
+                {
+                    Isbn = "9780135957059",
+                    Title = materialOneTitle,
+                    Language = "English",
+                    Lendable = true,
+                    Description = "Some description here",
+                },
+                new Material
+                {
+                    Isbn = "9780132350884",
+                    Title = materialTwoTitle,
+                    Language = "English",
+                    Lendable = true,
+                    Description = "Some description here",
+                },
+                new Material
+                {
+                    Isbn = "9780062301253",
+                    Title = materialThreeTitle,
+                    Language = "English",
+                    Lendable = true,
+                    Description = "Some description here",
+                },
+            };
+
+            // add authors to materials
+            insertedMaterials.ForEach(material =>
+            {
+                material.MaterialAuthors = new List<MaterialAuthor>
+                {
+                    new MaterialAuthor
+                    {
+                        Author = insertedAuthorTwo,
+                        Material = material,
+                    }
+                };
+            });
+
+            using (var context = new GTLContext(options))
+            {
+                context.Add(insertedAuthor);
+                context.AddRange(insertedMaterials);
+                context.SaveChanges();
+            }
+
+            using (var context = new GTLContext(options))
+            {
+                var authorController = ControllerFactory.CreateAuthorController(context);
+                var author = context.Authors.FirstOrDefault(a => a.FirstName == insertedAuthor.FirstName);
+                Assert.IsNotNull(author);
+
+                var materials = authorController.FindMaterials(author);
+
+                // assert materials
+                Assert.IsNotNull(materials);
+                Assert.AreEqual(0, materials.Count);
+            }
         }
     }
 }

@@ -128,9 +128,17 @@ namespace Server.Controllers
             return author;
         }
 
+        /// <summary>
+        /// Fetches all materials found in the database that are written by the author passed as a parameter
+        /// </summary>
+        /// <param name="author">The author to search by. Must already be inserted in the database</param>
+        /// <returns>A list of all materials found that are written by the author (could be an empty list)</returns>
         public List<Material> FindMaterials(Author author)
         {
-            throw new System.NotImplementedException();
+            return _db.Materials
+                .Where(m => m.MaterialAuthors
+                    .Any(ma => ma.AuthorId == author.AuthorId))
+                .ToList();
         }
     }
 }
