@@ -77,9 +77,15 @@ namespace Server.Controllers
             return author;
         }
 
-        public int Delete(Author t)
+        /// <summary>
+        /// Deletes an author entity from the context and applies the removal to the database.
+        /// </summary>
+        /// <param name="author">The author to be removed</param>
+        /// <returns>The number of rows affected on the database</returns>
+        public int Delete(Author author)
         {
-            throw new System.NotImplementedException();
+            _db.Remove(author);
+            return _db.SaveChanges();
         }
 
         /// <summary>
