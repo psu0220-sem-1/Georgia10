@@ -66,6 +66,7 @@ namespace Server.Controllers
         /// </summary>
         /// <param name="author">An author instance that has been changed</param>
         /// <returns>The author instance passed if changes are saved, null otherwise</returns>
+        /// <remarks>NOT TESTED</remarks>
         public Author Update(Author author)
         {
             if (!_db.ChangeTracker.HasChanges())
@@ -82,6 +83,7 @@ namespace Server.Controllers
         /// </summary>
         /// <param name="author">The author to be removed</param>
         /// <returns>The number of rows affected on the database</returns>
+        /// <remarks>NOT TESTED</remarks>
         public int Delete(Author author)
         {
             _db.Remove(author);
