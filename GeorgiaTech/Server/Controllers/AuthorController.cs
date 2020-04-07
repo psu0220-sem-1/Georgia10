@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using Server.Models;
 
 namespace Server.Controllers
@@ -70,11 +71,23 @@ namespace Server.Controllers
         public Author Update(Author author)
         {
             if (!_db.ChangeTracker.HasChanges())
-            {
                 return null;
+
+            int changedRows;
+            using var transaction = _db.Database.BeginTransaction();
+
+            try
+            {
+                // TODO: return changed rows once IController's Update method signature has been updated
+                changedRows = _db.SaveChanges();
+                transaction.Commit();
+            }
+            catch (DbUpdateException)
+            {
+                transaction.Rollback();
+                throw;
             }
 
-            _db.SaveChanges();
             return author;
         }
 
