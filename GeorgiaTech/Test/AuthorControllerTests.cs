@@ -55,117 +55,127 @@ namespace Test
         [Test]
         public void CreateCreatesCorrectAuthorInstance()
         {
+            // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("CreateCreatesCorrectAuthorInstance")
                 .Options;
-
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
 
+            // action
             var author = authorController.Create(authorFirstName, authorLastName);
 
-            Assert.IsInstanceOf(typeof(Author), author);
-            Assert.AreEqual(authorFirstName, author.FirstName);
-            Assert.AreEqual(authorLastName, author.LastName);
+            // assertion
+            Assert.That(author, Has
+                .Property("FirstName").EqualTo(authorFirstName).And
+                .Property("LastName").EqualTo(authorLastName));
         }
 
         [Test]
         public void CreateThrowsArgumentOutOfRangeExceptionWithFirstNameLongerThan50()
         {
+            // setup
             authorFirstName = "123456789012345678901234567890123456789012345678901";
-            Assert.IsTrue(authorFirstName.Length > 50);
-
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("CreateThrowsArgumentOutOfRangeExceptionWithFirstNameLongerThan50")
                 .Options;
-
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
-            Assert.Throws<ArgumentOutOfRangeException>(() => authorController.Create(authorFirstName, authorLastName));
+
+            // assertion
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                authorController.Create(authorFirstName, authorLastName));
         }
 
 
         [Test]
         public void CreateThrowsArgumentExceptionWithEmptyFirstNameArgument()
         {
+            // setup
             authorFirstName = "";
-
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("CreateThrowsArgumentExceptionWithEmptyFirstNameArgument")
                 .Options;
-
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
-            Assert.Throws<ArgumentException>(() => { authorController.Create(authorFirstName, authorLastName); });
+
+            // assertion
+            Assert.Throws<ArgumentException>(() =>
+                authorController.Create(authorFirstName, authorLastName));
         }
 
         [Test]
         public void CreateThrowsArgumentOutOfRangeExceptionWithLastNameLongerThan50()
         {
+            // setup
             authorLastName = "123456789012345678901234567890123456789012345678901";
-            Assert.IsTrue(authorLastName.Length > 50);
-
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("CreateThrowsArgumentOutOfRangeExceptionWithLastNameLongerThan50")
                 .Options;
-
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
-            Assert.Throws<ArgumentOutOfRangeException>(() => authorController.Create(authorFirstName, authorLastName));
+
+            // assertion
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                authorController.Create(authorFirstName, authorLastName));
         }
 
         [Test]
         public void CreateThrowsArgumentExceptionWithEmptyLastNameArgument()
         {
+            // setup
             authorLastName = "";
-
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("CreateThrowsArgumentExceptionWithEmptyLastNameArgument")
                 .Options;
-
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
 
-            Assert.Throws<ArgumentException>(() => { authorController.Create(authorFirstName, authorLastName); });
+            // assertion
+            Assert.Throws<ArgumentException>(() =>
+                authorController.Create(authorFirstName, authorLastName));
         }
 
         [Test]
         public void InsertInsertsCorrectly()
         {
+            // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("InsertInsertsCorrectly")
                 .Options;
 
-            using var context = new GTLContext(options);
-            var authorController = ControllerFactory.CreateAuthorController(context);
-
-            var author = authorController.Create(authorFirstName, authorLastName);
-            Assert.AreEqual(0, author.AuthorId);
-
-            authorController.Insert(author);
-
-            var insertedAuthor = context.Authors
-                .FirstOrDefault(a => a.FirstName == authorFirstName && a.LastName == authorLastName);
-
-            Assert.Multiple(() =>
+            // action
+            using (var context = new GTLContext(options))
             {
-                Assert.IsNotNull(insertedAuthor);
-                Assert.AreEqual(author.AuthorId, insertedAuthor.AuthorId);
-                Assert.AreEqual(author.FirstName, insertedAuthor.FirstName);
-                Assert.AreEqual(author.LastName, insertedAuthor.LastName);
-            });
+                var authorController = ControllerFactory.CreateAuthorController(context);
+                var author = new Author {FirstName = authorFirstName, LastName = authorLastName};
+
+                authorController.Insert(author);
+            }
+
+            // assertion
+            using (var context = new GTLContext(options))
+            {
+                var fetchedAuthor = context.Authors
+                    .FirstOrDefault(a => a.FirstName == authorFirstName && a.LastName == authorLastName);
+
+                Assert.That(fetchedAuthor, Has
+                    .Property("FirstName").EqualTo(authorFirstName).And
+                    .Property("LastName").EqualTo(authorLastName));
+            }
         }
 
         [Test]
         public void InsertThrowsArgumentNullExceptionWithNullAuthorParam()
         {
+            // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("InsertThrowsArgumentNullExceptionWithNullAuthorParam")
                 .Options;
-
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
 
+            // assertion
             Assert.Throws<ArgumentNullException>(() => authorController.Insert(null));
         }
 
@@ -185,7 +195,7 @@ namespace Test
                 // silently catch the error that's supposed to be thrown by the Insert method
                 // in order to test the after effect
                 try { authorController.Insert(null); }
-                catch (ArgumentNullException e) { }
+                catch (ArgumentNullException) { }
             }
 
             // assertion
@@ -198,52 +208,61 @@ namespace Test
         [Test]
         public void FindByIdFindsAnExistingAuthor()
         {
+            // setup
+            int authorId;
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("FindByIdFindsAnExistingAuthor")
                 .Options;
 
-            using var context = new GTLContext(options);
-            var authorController = ControllerFactory.CreateAuthorController(context);
-            var insertedAuthor = authorController.Create(authorFirstName, authorLastName);
-            Assert.NotNull(insertedAuthor);
-            authorController.Insert(insertedAuthor);
-
-            var author = authorController.FindByID(insertedAuthor.AuthorId);
-            Assert.Multiple(() =>
+            // action
+            using (var context = new GTLContext(options))
             {
-                Assert.NotNull(author);
-                Assert.AreEqual(insertedAuthor.AuthorId, author.AuthorId);
-                Assert.AreEqual(authorFirstName, author.FirstName);
-                Assert.AreEqual(authorLastName, author.LastName);
-            });
+                var author = new Author {FirstName = authorFirstName, LastName = authorLastName};
+                context.Add(author);
+                context.SaveChanges();
+                authorId = author.AuthorId;
+            }
+
+            // assertion
+            using (var context = new GTLContext(options))
+            {
+                var authorController = ControllerFactory.CreateAuthorController(context);
+                var fetchedAuthor = authorController.FindByID(authorId);
+
+                Assert.That(fetchedAuthor, Has
+                    .Property("FirstName").EqualTo(authorFirstName).And
+                    .Property("LastName").EqualTo(authorLastName));
+            }
         }
 
         [Test]
         public void FindByIdReturnsNullOnANonExistingAuthor()
         {
+            // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("FindByIdReturnsNullOnANonExistingAuthor")
                 .Options;
 
+            // action
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
-            // create an author to use their ID (incremented) to be sure to try to get a non existing entity
-            var insertedAuthor = authorController.Create(authorFirstName, authorLastName);
-            authorController.Insert(insertedAuthor);
+            // some random number, doesn't matter what
+            var fetchedAuthor = authorController.FindByID(11);
 
-            var author = authorController.FindByID(insertedAuthor.AuthorId + 1);
-            Assert.IsNull(author);
+            // assertion
+            Assert.That(fetchedAuthor, Is.Null);
         }
 
         [Test]
         public void FindMaterialsFetchesMaterialsWithASingleAuthor()
         {
+            // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("FindMaterialsFetchesMaterialsWithASingleAuthor")
                 .UseLazyLoadingProxies()
                 .Options;
 
-            // setup
+            // action
             var author = new Author { FirstName = authorFirstName, LastName = authorLastName };
 
             // add authors to materials
@@ -251,11 +270,7 @@ namespace Test
             {
                 material.MaterialAuthors = new List<MaterialAuthor>
                 {
-                    new MaterialAuthor
-                    {
-                        Author = author,
-                        Material = material,
-                    }
+                    new MaterialAuthor {Author = author, Material = material}
                 };
             });
 
@@ -265,55 +280,37 @@ namespace Test
                 context.SaveChanges();
             }
 
-            // action
+            // assertion
             using (var context = new GTLContext(options))
             {
                 var authorController = ControllerFactory.CreateAuthorController(context);
                 var fetchedAuthor = context.Authors.FirstOrDefault(a => a.FirstName == authorFirstName);
-                Assert.IsNotNull(fetchedAuthor);
-
                 var fetchedMaterials = authorController.FindMaterials(fetchedAuthor);
 
-                // assert material authors
-                fetchedMaterials.ForEach(material =>
-                {
-                    Assert.Multiple(() =>
-                    {
-                        Assert.AreEqual(1, material.MaterialAuthors.Count);
-                        Assert.IsNotNull(material.MaterialAuthors.FirstOrDefault(ma =>
-                            ma.Author.FirstName == authorFirstName && ma.Author.LastName == authorLastName));
-                    });
-                });
+                Assert.That(fetchedMaterials, Has.Exactly(materials.Count).Items);
             }
         }
 
         [Test]
         public void FindMaterialsFetchesMaterialsWithMultipleAuthors()
         {
+            // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("FindMaterialsFetchesMaterialsWithMultipleAuthors")
                 .UseLazyLoadingProxies()
                 .Options;
 
-            // setup
             var authorOne = new Author { FirstName = authorFirstName, LastName = authorLastName };
             var authorTwo = new Author { FirstName = "Gergana", LastName = "Petkova" };
 
+            // action
             // add authors to materials
             materials.ForEach(material =>
             {
                 material.MaterialAuthors = new List<MaterialAuthor>
                 {
-                    new MaterialAuthor
-                    {
-                        Author = authorOne,
-                        Material = material,
-                    },
-                    new MaterialAuthor
-                    {
-                        Author = authorTwo,
-                        Material = material,
-                    }
+                    new MaterialAuthor {Author = authorOne, Material = material},
+                    new MaterialAuthor {Author = authorTwo, Material = material}
                 };
             });
 
@@ -323,50 +320,36 @@ namespace Test
                 context.SaveChanges();
             }
 
+            // assertion
             using (var context = new GTLContext(options))
             {
                 var authorController = ControllerFactory.CreateAuthorController(context);
                 var fetchedAuthor = context.Authors.FirstOrDefault(a => a.FirstName == authorOne.FirstName);
-                Assert.IsNotNull(fetchedAuthor);
 
                 var fetchedMaterials = authorController.FindMaterials(fetchedAuthor);
-
-                // assert material authors
-                fetchedMaterials.ForEach(material =>
-                {
-                    Assert.Multiple(() =>
-                    {
-                        Assert.AreEqual(2, material.MaterialAuthors.Count);
-                        Assert.IsNotNull(material.MaterialAuthors.FirstOrDefault(ma =>
-                            ma.Author.FirstName == authorFirstName && ma.Author.LastName == authorLastName));
-                    });
-                });
+                Assert.That(fetchedMaterials, Has.Exactly(materials.Count).Items);
             }
         }
 
         [Test]
         public void FindMaterialsDoesNotFetchAnyMaterialsWithOneAuthorAndZeroMaterials()
         {
+            // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("FindMaterialsDoesNotFetchAnyMaterialsWithOneAuthorAndZeroMaterials")
                 .UseLazyLoadingProxies()
                 .Options;
 
-            // setup
-
             var authorOne = new Author { FirstName = authorFirstName, LastName = authorLastName };
             var authorTwo = new Author { FirstName = "Gergana", LastName = "Petkova" };
 
+            // action
             // add authors to materials
             materials.ForEach(material =>
             {
                 material.MaterialAuthors = new List<MaterialAuthor>
                 {
-                    new MaterialAuthor
-                    {
-                        Author = authorTwo,
-                        Material = material,
-                    }
+                    new MaterialAuthor {Author = authorTwo, Material = material}
                 };
             });
 
@@ -377,17 +360,15 @@ namespace Test
                 context.SaveChanges();
             }
 
+            // assertion
             using (var context = new GTLContext(options))
             {
                 var authorController = ControllerFactory.CreateAuthorController(context);
                 var fetchedAuthor = context.Authors.FirstOrDefault(a => a.FirstName == authorFirstName);
-                Assert.IsNotNull(fetchedAuthor);
 
                 var fetchedMaterials = authorController.FindMaterials(fetchedAuthor);
 
-                // assert materials
-                Assert.IsNotNull(fetchedMaterials);
-                Assert.AreEqual(0, fetchedMaterials.Count);
+                Assert.That(fetchedMaterials, Is.Empty.And.Not.Null);
             }
         }
     }
