@@ -97,6 +97,12 @@ namespace Server
                 entity.HasKey(address => address.AddressId);
 
                 // properties
+                entity.Property(address => address.AddressId)
+                    .HasColumnName("address_id");
+
+                entity.Property(address => address.ZipCode)
+                    .HasColumnName("zip");
+
                 entity.Property(address => address.AdditionalInfo)
                     .IsRequired(false)
                     .HasColumnName("additional_info")
@@ -108,9 +114,6 @@ namespace Server
                     .HasColumnName("street")
                     .HasMaxLength(100)
                     .IsUnicode(false);
-
-                entity.Property(address => address.Zip)
-                    .HasColumnName("zip");
 
                 // relations
                 // don't set a navigational property on the zip side
@@ -147,6 +150,8 @@ namespace Server
 
             modelBuilder.Entity<Author>(entity =>
             {
+                entity.ToTable("author");
+
                 // key
                 entity.HasKey(author => author.AuthorId);
 
