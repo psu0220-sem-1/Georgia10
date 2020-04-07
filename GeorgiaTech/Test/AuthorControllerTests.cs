@@ -167,7 +167,32 @@ namespace Test
             var authorController = ControllerFactory.CreateAuthorController(context);
 
             Assert.Throws<ArgumentNullException>(() => authorController.Insert(null));
-            Assert.AreEqual(0, context.Authors.Count());
+        }
+
+        [Test]
+        public void InsertDoesNotInsertWithNullAuthorParam()
+        {
+            // setup
+            var options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase("InsertThrowsArgumentNullExceptionWithNullAuthorParam")
+                .Options;
+
+            // action
+            using (var context = new GTLContext(options))
+            {
+                var authorController = ControllerFactory.CreateAuthorController(context);
+
+                // silently catch the error that's supposed to be thrown by the Insert method
+                // in order to test the after effect
+                try { authorController.Insert(null); }
+                catch (ArgumentNullException e) { }
+            }
+
+            // assertion
+            using (var context = new GTLContext(options))
+            {
+                Assert.That(context.Authors.Count(), Is.EqualTo(0));
+            }
         }
 
         [Test]
