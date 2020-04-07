@@ -9,6 +9,8 @@ using Server.Models;
 
 namespace Test
 {
+    [TestFixture]
+    [Author("Nikola Anastasov Velichkov", "federlizer@gmail.com")]
     public class AuthorControllerTests
     {
         [Test]
