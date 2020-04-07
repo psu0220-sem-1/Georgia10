@@ -13,12 +13,48 @@ namespace Test
     [Author("Nikola Anastasov Velichkov", "federlizer@gmail.com")]
     public class AuthorControllerTests
     {
+        private string authorFirstName;
+        private string authorLastName;
+        private List<Material> materials;
+
+        [SetUp]
+        public void Setup()
+        {
+            authorFirstName = "Nikola";
+            authorLastName = "Velichkov";
+
+            materials = new List<Material>
+            {
+                new Material
+                {
+                    Isbn = "9780135957059",
+                    Title = "Pragmatic Programmer special 2nd",
+                    Language = "English",
+                    Lendable = true,
+                    Description = "Some description here",
+                },
+                new Material
+                {
+                    Isbn = "9780132350884",
+                    Title = "Clean Code: A Handbook of Agile Software Craftsmanship",
+                    Language = "English",
+                    Lendable = true,
+                    Description = "Some description here",
+                },
+                new Material
+                {
+                    Isbn = "9780062301253",
+                    Title = "Elon Musk: Tesla, SpaceX, and the Quest for a Fantastic Future",
+                    Language = "English",
+                    Lendable = true,
+                    Description = "Some description here",
+                },
+            };
+        }
+
         [Test]
         public void CreateCreatesCorrectAuthorInstance()
         {
-            const string firstName = "Nikola";
-            const string lastName = "Velichkov";
-
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("CreateCreatesCorrectAuthorInstance")
                 .Options;
@@ -26,19 +62,18 @@ namespace Test
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
 
-            var author = authorController.Create(firstName, lastName);
+            var author = authorController.Create(authorFirstName, authorLastName);
 
             Assert.IsInstanceOf(typeof(Author), author);
-            Assert.AreEqual(firstName, author.FirstName);
-            Assert.AreEqual(lastName, author.LastName);
+            Assert.AreEqual(authorFirstName, author.FirstName);
+            Assert.AreEqual(authorLastName, author.LastName);
         }
 
         [Test]
         public void CreateThrowsArgumentOutOfRangeExceptionWithFirstNameLongerThan50()
         {
-            const string firstName = "123456789012345678901234567890123456789012345678901";
-            const string lastName = "Velichkov";
-            Assert.IsTrue(firstName.Length > 50);
+            authorFirstName = "123456789012345678901234567890123456789012345678901";
+            Assert.IsTrue(authorFirstName.Length > 50);
 
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("CreateThrowsArgumentOutOfRangeExceptionWithFirstNameLongerThan50")
@@ -46,15 +81,14 @@ namespace Test
 
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
-            Assert.Throws<ArgumentOutOfRangeException>(() => authorController.Create(firstName, lastName));
+            Assert.Throws<ArgumentOutOfRangeException>(() => authorController.Create(authorFirstName, authorLastName));
         }
 
 
         [Test]
         public void CreateThrowsArgumentExceptionWithEmptyFirstNameArgument()
         {
-            const string firstName = "";
-            const string lastName = "Velichkov";
+            authorFirstName = "";
 
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("CreateThrowsArgumentExceptionWithEmptyFirstNameArgument")
@@ -62,15 +96,14 @@ namespace Test
 
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
-            Assert.Throws<ArgumentException>(() => { authorController.Create(firstName, lastName); });
+            Assert.Throws<ArgumentException>(() => { authorController.Create(authorFirstName, authorLastName); });
         }
 
         [Test]
         public void CreateThrowsArgumentOutOfRangeExceptionWithLastNameLongerThan50()
         {
-            const string firstName = "Nikola";
-            const string lastName = "123456789012345678901234567890123456789012345678901";
-            Assert.IsTrue(lastName.Length > 50);
+            authorLastName = "123456789012345678901234567890123456789012345678901";
+            Assert.IsTrue(authorLastName.Length > 50);
 
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("CreateThrowsArgumentOutOfRangeExceptionWithLastNameLongerThan50")
@@ -78,14 +111,13 @@ namespace Test
 
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
-            Assert.Throws<ArgumentOutOfRangeException>(() => authorController.Create(firstName, lastName));
+            Assert.Throws<ArgumentOutOfRangeException>(() => authorController.Create(authorFirstName, authorLastName));
         }
 
         [Test]
         public void CreateThrowsArgumentExceptionWithEmptyLastNameArgument()
         {
-            const string firstName = "Nikola";
-            const string lastName = "";
+            authorLastName = "";
 
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("CreateThrowsArgumentExceptionWithEmptyLastNameArgument")
@@ -94,15 +126,12 @@ namespace Test
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
 
-            Assert.Throws<ArgumentException>(() => { authorController.Create(firstName, lastName); });
+            Assert.Throws<ArgumentException>(() => { authorController.Create(authorFirstName, authorLastName); });
         }
 
         [Test]
         public void InsertInsertsCorrectly()
         {
-            const string firstName = "Nikola";
-            const string lastName = "Velichkov";
-
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("InsertInsertsCorrectly")
                 .Options;
@@ -110,13 +139,13 @@ namespace Test
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
 
-            var author = authorController.Create(firstName, lastName);
+            var author = authorController.Create(authorFirstName, authorLastName);
             Assert.AreEqual(0, author.AuthorId);
 
             authorController.Insert(author);
 
             var insertedAuthor = context.Authors
-                .FirstOrDefault(a => a.FirstName == firstName && a.LastName == lastName);
+                .FirstOrDefault(a => a.FirstName == authorFirstName && a.LastName == authorLastName);
 
             Assert.Multiple(() =>
             {
@@ -144,16 +173,13 @@ namespace Test
         [Test]
         public void FindByIdFindsAnExistingAuthor()
         {
-            const string firstName = "Nikola";
-            const string lastName = "Velichkov";
-
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("FindByIdFindsAnExistingAuthor")
                 .Options;
 
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
-            var insertedAuthor = authorController.Create(firstName, lastName);
+            var insertedAuthor = authorController.Create(authorFirstName, authorLastName);
             Assert.NotNull(insertedAuthor);
             authorController.Insert(insertedAuthor);
 
@@ -162,17 +188,14 @@ namespace Test
             {
                 Assert.NotNull(author);
                 Assert.AreEqual(insertedAuthor.AuthorId, author.AuthorId);
-                Assert.AreEqual(firstName, author.FirstName);
-                Assert.AreEqual(lastName, author.LastName);
+                Assert.AreEqual(authorFirstName, author.FirstName);
+                Assert.AreEqual(authorLastName, author.LastName);
             });
         }
 
         [Test]
         public void FindByIdDoesNotFindANonExistingAuthor()
         {
-            const string firstName = "Nikola";
-            const string lastName = "Velichkov";
-
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("FindByIdDoesNotFindANonExistingAuthor")
                 .Options;
@@ -180,7 +203,7 @@ namespace Test
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
             // create an author to use their ID (incremented) to be sure to try to get a non existing entity
-            var insertedAuthor = authorController.Create(firstName, lastName);
+            var insertedAuthor = authorController.Create(authorFirstName, authorLastName);
             authorController.Insert(insertedAuthor);
 
             var author = authorController.FindByID(insertedAuthor.AuthorId + 1);
@@ -196,52 +219,16 @@ namespace Test
                 .Options;
 
             // setup
-            const string materialOneTitle = "Pragmatic Programmer special 2nd";
-            const string materialTwoTitle = "Clean Code: A Handbook of Agile Software Craftsmanship";
-            const string materialThreeTitle = "Elon Musk: Tesla, SpaceX, and the Quest for a Fantastic Future";
-
-            var insertedAuthor = new Author
-            {
-                FirstName = "Nikola",
-                LastName = "Velichkov",
-            };
-
-            var insertedMaterials = new List<Material>
-            {
-                new Material
-                {
-                    Isbn = "9780135957059",
-                    Title = materialOneTitle,
-                    Language = "English",
-                    Lendable = true,
-                    Description = "Some description here",
-                },
-                new Material
-                {
-                    Isbn = "9780132350884",
-                    Title = materialTwoTitle,
-                    Language = "English",
-                    Lendable = true,
-                    Description = "Some description here",
-                },
-                new Material
-                {
-                    Isbn = "9780062301253",
-                    Title = materialThreeTitle,
-                    Language = "English",
-                    Lendable = true,
-                    Description = "Some description here",
-                },
-            };
+            var author = new Author { FirstName = authorFirstName, LastName = authorLastName };
 
             // add authors to materials
-            insertedMaterials.ForEach(material =>
+            materials.ForEach(material =>
             {
                 material.MaterialAuthors = new List<MaterialAuthor>
                 {
                     new MaterialAuthor
                     {
-                        Author = insertedAuthor,
+                        Author = author,
                         Material = material,
                     }
                 };
@@ -249,7 +236,7 @@ namespace Test
 
             using (var context = new GTLContext(options))
             {
-                context.AddRange(insertedMaterials);
+                context.AddRange(materials);
                 context.SaveChanges();
             }
 
@@ -257,29 +244,19 @@ namespace Test
             using (var context = new GTLContext(options))
             {
                 var authorController = ControllerFactory.CreateAuthorController(context);
-                var author = context.Authors.FirstOrDefault(a => a.FirstName == insertedAuthor.FirstName);
-                Assert.IsNotNull(author);
+                var fetchedAuthor = context.Authors.FirstOrDefault(a => a.FirstName == authorFirstName);
+                Assert.IsNotNull(fetchedAuthor);
 
-                var materials = authorController.FindMaterials(author);
-
-                // assert materials
-                Assert.Multiple(() =>
-                {
-                    Assert.IsNotNull(materials);
-                    Assert.AreEqual(3, materials.Count);
-                    Assert.IsTrue(materials.Any(m => m.Title == materialOneTitle));
-                    Assert.IsTrue(materials.Any(m => m.Title == materialTwoTitle));
-                    Assert.IsTrue(materials.Any(m => m.Title == materialThreeTitle));
-                });
+                var fetchedMaterials = authorController.FindMaterials(fetchedAuthor);
 
                 // assert material authors
-                materials.ForEach(material =>
+                fetchedMaterials.ForEach(material =>
                 {
                     Assert.Multiple(() =>
                     {
                         Assert.AreEqual(1, material.MaterialAuthors.Count);
                         Assert.IsNotNull(material.MaterialAuthors.FirstOrDefault(ma =>
-                            ma.Author.FirstName == insertedAuthor.FirstName && ma.Author.LastName == insertedAuthor.LastName));
+                            ma.Author.FirstName == authorFirstName && ma.Author.LastName == authorLastName));
                     });
                 });
             }
@@ -294,63 +271,22 @@ namespace Test
                 .Options;
 
             // setup
-            const string materialOneTitle = "Pragmatic Programmer special 2nd";
-            const string materialTwoTitle = "Clean Code: A Handbook of Agile Software Craftsmanship";
-            const string materialThreeTitle = "Elon Musk: Tesla, SpaceX, and the Quest for a Fantastic Future";
-
-            var insertedAuthor = new Author
-            {
-                FirstName = "Nikola",
-                LastName = "Velichkov",
-            };
-
-            var insertedAuthorTwo = new Author
-            {
-                FirstName = "Gergana",
-                LastName = "Petkova",
-            };
-
-            var insertedMaterials = new List<Material>
-            {
-                new Material
-                {
-                    Isbn = "9780135957059",
-                    Title = materialOneTitle,
-                    Language = "English",
-                    Lendable = true,
-                    Description = "Some description here",
-                },
-                new Material
-                {
-                    Isbn = "9780132350884",
-                    Title = materialTwoTitle,
-                    Language = "English",
-                    Lendable = true,
-                    Description = "Some description here",
-                },
-                new Material
-                {
-                    Isbn = "9780062301253",
-                    Title = materialThreeTitle,
-                    Language = "English",
-                    Lendable = true,
-                    Description = "Some description here",
-                },
-            };
+            var authorOne = new Author { FirstName = authorFirstName, LastName = authorLastName };
+            var authorTwo = new Author { FirstName = "Gergana", LastName = "Petkova" };
 
             // add authors to materials
-            insertedMaterials.ForEach(material =>
+            materials.ForEach(material =>
             {
                 material.MaterialAuthors = new List<MaterialAuthor>
                 {
                     new MaterialAuthor
                     {
-                        Author = insertedAuthor,
+                        Author = authorOne,
                         Material = material,
                     },
                     new MaterialAuthor
                     {
-                        Author = insertedAuthorTwo,
+                        Author = authorTwo,
                         Material = material,
                     }
                 };
@@ -358,36 +294,26 @@ namespace Test
 
             using (var context = new GTLContext(options))
             {
-                context.AddRange(insertedMaterials);
+                context.AddRange(materials);
                 context.SaveChanges();
             }
 
             using (var context = new GTLContext(options))
             {
                 var authorController = ControllerFactory.CreateAuthorController(context);
-                var author = context.Authors.FirstOrDefault(a => a.FirstName == insertedAuthor.FirstName);
-                Assert.IsNotNull(author);
+                var fetchedAuthor = context.Authors.FirstOrDefault(a => a.FirstName == authorOne.FirstName);
+                Assert.IsNotNull(fetchedAuthor);
 
-                var materials = authorController.FindMaterials(author);
-
-                // assert materials
-                Assert.Multiple(() =>
-                {
-                    Assert.IsNotNull(materials);
-                    Assert.AreEqual(3, materials.Count);
-                    Assert.IsTrue(materials.Any(m => m.Title == materialOneTitle));
-                    Assert.IsTrue(materials.Any(m => m.Title == materialTwoTitle));
-                    Assert.IsTrue(materials.Any(m => m.Title == materialThreeTitle));
-                });
+                var fetchedMaterials = authorController.FindMaterials(fetchedAuthor);
 
                 // assert material authors
-                materials.ForEach(material =>
+                fetchedMaterials.ForEach(material =>
                 {
                     Assert.Multiple(() =>
                     {
                         Assert.AreEqual(2, material.MaterialAuthors.Count);
                         Assert.IsNotNull(material.MaterialAuthors.FirstOrDefault(ma =>
-                            ma.Author.FirstName == insertedAuthor.FirstName && ma.Author.LastName == insertedAuthor.LastName));
+                            ma.Author.FirstName == authorFirstName && ma.Author.LastName == authorLastName));
                     });
                 });
             }
@@ -402,58 +328,18 @@ namespace Test
                 .Options;
 
             // setup
-            const string materialOneTitle = "Pragmatic Programmer special 2nd";
-            const string materialTwoTitle = "Clean Code: A Handbook of Agile Software Craftsmanship";
-            const string materialThreeTitle = "Elon Musk: Tesla, SpaceX, and the Quest for a Fantastic Future";
 
-            var insertedAuthor = new Author
-            {
-                FirstName = "Nikola",
-                LastName = "Velichkov",
-            };
-
-            var insertedAuthorTwo = new Author
-            {
-                FirstName = "Gergana",
-                LastName = "Petkova",
-            };
-
-            var insertedMaterials = new List<Material>
-            {
-                new Material
-                {
-                    Isbn = "9780135957059",
-                    Title = materialOneTitle,
-                    Language = "English",
-                    Lendable = true,
-                    Description = "Some description here",
-                },
-                new Material
-                {
-                    Isbn = "9780132350884",
-                    Title = materialTwoTitle,
-                    Language = "English",
-                    Lendable = true,
-                    Description = "Some description here",
-                },
-                new Material
-                {
-                    Isbn = "9780062301253",
-                    Title = materialThreeTitle,
-                    Language = "English",
-                    Lendable = true,
-                    Description = "Some description here",
-                },
-            };
+            var authorOne = new Author { FirstName = authorFirstName, LastName = authorLastName };
+            var authorTwo = new Author { FirstName = "Gergana", LastName = "Petkova" };
 
             // add authors to materials
-            insertedMaterials.ForEach(material =>
+            materials.ForEach(material =>
             {
                 material.MaterialAuthors = new List<MaterialAuthor>
                 {
                     new MaterialAuthor
                     {
-                        Author = insertedAuthorTwo,
+                        Author = authorTwo,
                         Material = material,
                     }
                 };
@@ -461,22 +347,22 @@ namespace Test
 
             using (var context = new GTLContext(options))
             {
-                context.Add(insertedAuthor);
-                context.AddRange(insertedMaterials);
+                context.Add(authorOne);
+                context.AddRange(materials);
                 context.SaveChanges();
             }
 
             using (var context = new GTLContext(options))
             {
                 var authorController = ControllerFactory.CreateAuthorController(context);
-                var author = context.Authors.FirstOrDefault(a => a.FirstName == insertedAuthor.FirstName);
-                Assert.IsNotNull(author);
+                var fetchedAuthor = context.Authors.FirstOrDefault(a => a.FirstName == authorFirstName);
+                Assert.IsNotNull(fetchedAuthor);
 
-                var materials = authorController.FindMaterials(author);
+                var fetchedMaterials = authorController.FindMaterials(fetchedAuthor);
 
                 // assert materials
-                Assert.IsNotNull(materials);
-                Assert.AreEqual(0, materials.Count);
+                Assert.IsNotNull(fetchedMaterials);
+                Assert.AreEqual(0, fetchedMaterials.Count);
             }
         }
     }
