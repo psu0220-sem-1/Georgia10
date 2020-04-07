@@ -174,7 +174,7 @@ namespace Test
         {
             // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("InsertThrowsArgumentNullExceptionWithNullAuthorParam")
+                .UseInMemoryDatabase("InsertDoesNotInsertWithNullAuthorParam")
                 .Options;
 
             // action
@@ -219,10 +219,10 @@ namespace Test
         }
 
         [Test]
-        public void FindByIdDoesNotFindANonExistingAuthor()
+        public void FindByIdReturnsNullOnANonExistingAuthor()
         {
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("FindByIdDoesNotFindANonExistingAuthor")
+                .UseInMemoryDatabase("FindByIdReturnsNullOnANonExistingAuthor")
                 .Options;
 
             using var context = new GTLContext(options);
