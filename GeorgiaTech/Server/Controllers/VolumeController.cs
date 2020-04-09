@@ -42,7 +42,8 @@ namespace Server.Controllers
 
         public int Delete(Volume t)
         {
-            throw new NotImplementedException();
+            _context.Remove(t);
+            return _context.SaveChanges(); ;
         }
 
         public List<Volume> FindAll()
