@@ -1,7 +1,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using NUnit.Framework.Interfaces;
 using Server;
 using Server.Controllers;
 using Server.Models;
