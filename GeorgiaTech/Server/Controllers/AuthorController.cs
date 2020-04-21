@@ -99,8 +99,21 @@ namespace Server.Controllers
         /// <remarks>NOT TESTED</remarks>
         public int Delete(Author author)
         {
-            _db.Remove(author);
-            return _db.SaveChanges();
+            int changedRows;
+            using var transaction = _db.Database.BeginTransaction();
+
+            try
+            {
+                _db.Remove(author);
+                changedRows = _db.SaveChanges();
+            }
+            catch (DbUpdateException)
+            {
+                transaction.Rollback();
+                throw; // rethrow
+            }
+
+            return changedRows;
         }
 
         /// <summary>
