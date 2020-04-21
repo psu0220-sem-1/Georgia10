@@ -30,16 +30,10 @@ namespace Test
             var addressController = ControllerFactory.CreateAddressController(context);
             var address = addressController.Create(street, additionalInfo, zipCode);
 
-            Assert.Multiple(() =>
-            {
-                Assert.IsNotNull(address);
-                Assert.AreEqual(street, address.Street);
-                Assert.AreEqual(additionalInfo, address.AdditionalInfo);
-
-                Assert.IsNotNull(address.Zip);
-                Assert.AreEqual(city, address.Zip.City);
-                Assert.AreEqual(zipCode, address.Zip.Code);
-            });
+            Assert.That(address, Has
+                .Property("Street").EqualTo(street).And
+                .Property("AdditionalInfo").EqualTo(additionalInfo).And
+                .Property("Zip"));
         }
 
         [Test]
@@ -63,6 +57,7 @@ namespace Test
             context.SaveChanges();
 
             var addressController = ControllerFactory.CreateAddressController(context);
+
             Assert.Throws<ArgumentOutOfRangeException>(() =>
                 addressController.Create(street, additionalInfo, zipCode));
         }
@@ -88,6 +83,7 @@ namespace Test
             context.SaveChanges();
 
             var addressController = ControllerFactory.CreateAddressController(context);
+
             Assert.Throws<ArgumentOutOfRangeException>(() =>
                 addressController.Create(street, additionalInfo, zipCode));
         }
@@ -107,6 +103,7 @@ namespace Test
 
             using var context = new GTLContext(options);
             var addressController = ControllerFactory.CreateAddressController(context);
+
             Assert.Throws<ArgumentException>(() =>
                 addressController.Create(street, additionalInfo, zipCode));
         }
@@ -140,16 +137,10 @@ namespace Test
 
             var address = addressController.FindByID(insertedAddress.Entity.AddressId);
 
-            Assert.Multiple(() =>
-            {
-                Assert.IsNotNull(address);
-                Assert.AreEqual(street, address.Street);
-                Assert.AreEqual(additionalInfo, address.AdditionalInfo);
-
-                Assert.IsNotNull(address.Zip);
-                Assert.AreEqual(zipCode, address.Zip.Code);
-                Assert.AreEqual(city, address.Zip.City);
-            });
+            Assert.That(address, Has
+                .Property("Street").EqualTo(street).And
+                .Property("AdditionalInfo").EqualTo(additionalInfo).And
+                .Property("Zip"));
         }
 
         [Test]
@@ -181,6 +172,7 @@ namespace Test
 
             // find an entity with an incremented ID (make sure there doesn't exist such an entity)
             var address = addressController.FindByID(insertedAddress.Entity.AddressId + 1);
+
             Assert.IsNull(address);
         }
     }
