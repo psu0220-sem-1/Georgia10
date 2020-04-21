@@ -15,9 +15,24 @@ namespace Server.Controllers
             _db = context;
         }
 
-        public Address Insert(Address t)
+        /// <summary>
+        /// Inserts an address entity in the database
+        /// </summary>
+        /// <param name="address">The address entity to be inserted</param>
+        /// <returns>The same address entity with its new ID assigned</returns>
+        /// <exception cref="ArgumentNullException">If address parameter is null</exception>
+        /// <remarks>Not tested</remarks>
+        public Address Insert(Address address)
         {
-            throw new System.NotImplementedException();
+            if (address == null)
+            {
+                throw new ArgumentNullException(nameof(address), "Address object can't be null");
+            }
+
+            _db.Add(address);
+            _db.SaveChanges();
+
+            return address;
         }
 
         /// <summary>
@@ -25,29 +40,85 @@ namespace Server.Controllers
         /// </summary>
         /// <param name="ID">The ID of the address</param>
         /// <returns>The found address or null</returns>
+        /// <remarks>Not tested</remarks>
         public Address FindByID(int ID)
         {
-            return _db.Addresses.Find(ID);
+            var address = _db.Addresses.Find(ID);
+            return address;
         }
 
+        [Obsolete]
         public Address FindByType(Address t)
         {
             throw new System.NotImplementedException();
         }
 
+        /// <summary>
+        /// Returns a list of all addresses saved on the database
+        /// </summary>
+        /// <returns>A list of all addresses saved on the database</returns>
+        /// <remarks>Not tested</remarks>
         public List<Address> FindAll()
         {
-            throw new System.NotImplementedException();
+            return _db.Addresses.ToList();
         }
 
-        public Address Update(Address t)
+        /// <summary>
+        /// Saves any changes to the context's entities. WARNING: this will save ALL changes made
+        /// to the current context, not only to the entity that is being passed.
+        /// </summary>
+        /// <param name="address">An address instance that will be updated</param>
+        /// <returns>The address instance passed if changes are saved, null otherwise</returns>
+        /// <remarks>Not tested</remarks>
+        public Address Update(Address address)
         {
-            throw new System.NotImplementedException();
+            if (!_db.ChangeTracker.HasChanges())
+                return null;
+
+            int changedRows;
+            using var transaction = _db.Database.BeginTransaction();
+
+            try
+            {
+                //TODO: return changed rows once IController has been updated
+                changedRows = _db.SaveChanges();
+                transaction.Commit();
+            }
+            catch (DbUpdateException)
+            {
+                transaction.Rollback();
+                throw; // rethrow
+            }
+
+            return address;
         }
 
-        public int Delete(Address t)
+        /// <summary>
+        /// Deletes an address entity from the context and removes it from the database as well.
+        /// WARNING: Calling this method WILL save any other changes made to the same context
+        /// passed to the controller!!!
+        /// </summary>
+        /// <param name="address">The address entity to be deleted</param>
+        /// <returns>The number of changed rows</returns>
+        /// <remarks>Not tested</remarks>
+        public int Delete(Address address)
         {
-            throw new System.NotImplementedException();
+            int changedRows;
+            using var transaction = _db.Database.BeginTransaction();
+
+            try
+            {
+                _db.Remove(address);
+                changedRows = _db.SaveChanges();
+                transaction.Commit();
+            }
+            catch (DbUpdateException)
+            {
+                transaction.Rollback();
+                throw;
+            }
+
+            return changedRows;
         }
 
         /// <summary>
