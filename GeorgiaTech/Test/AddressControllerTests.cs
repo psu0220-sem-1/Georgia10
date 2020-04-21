@@ -1,179 +1,179 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 using Server;
 using Server.Controllers;
 using Server.Models;
 
 namespace Test
 {
+    [TestFixture]
+    [Author("Nikola Anastasov Velichkov", "federlizer@gmail.com")]
     public class AddressControllerTests
     {
+        private string street;
+        private string additionalInfo;
+        private ZipCode zip;
+
+        [SetUp]
+        public void Setup()
+        {
+            street = "Spobjergvej 26";
+            additionalInfo = "1.4";
+            zip = new ZipCode {City = "Aarhus", Code = 8000};
+        }
+
         [Test]
         public void CreateCreatesCorrectAddressInstance()
         {
-            const string street = "Spobjergvej 26";
-            const string additionalInfo = "1.4";
-            const int zipCode = 8000;
-            const string city = "Aarhus";
-
+            // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("CreateCreatesCorrectAddressInstance")
                 .Options;
 
-            using var context = new GTLContext(options);
+            using (var context = new GTLContext(options))
+            {
+                context.Add(zip);
+                context.SaveChanges();
+            }
 
-            // make sure to have the zip code you need to run the test
-            context.Add(new ZipCode {City = city, Code = zipCode});
-            context.SaveChanges();
+            // action
+            using (var context = new GTLContext(options))
+            {
+                var addressController = ControllerFactory.CreateAddressController(context);
+                var address = addressController.Create(street, additionalInfo, zip.Code);
 
-            var addressController = ControllerFactory.CreateAddressController(context);
-            var address = addressController.Create(street, additionalInfo, zipCode);
-
-            Assert.That(address, Has
-                .Property("Street").EqualTo(street).And
-                .Property("AdditionalInfo").EqualTo(additionalInfo).And
-                .Property("Zip"));
+                // assertion
+                Assert.That(address, Has
+                    .Property("Street").EqualTo(street).And
+                    .Property("AdditionalInfo").EqualTo(additionalInfo).And
+                    .Property("Zip"));
+            }
         }
 
         [Test]
         public void CreateThrowsAnArgumentOutOfRangeExceptionWithEmptyStreetParam()
         {
-            const string street = "";
-            const string additionalInfo = "1.4";
-            const int zipCode = 8000;
-            const string city = "Aarhus";
-
-            Assert.IsTrue(street.Length == 0);
-
+            // setup
+            street = "";
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("CreateThrowsAnArgumentOutOfRangeExceptionWithEmptyStreetParam")
                 .Options;
 
-            using var context = new GTLContext(options);
+            using (var context = new GTLContext(options))
+            {
+                context.Add(zip);
+                context.SaveChanges();
+            }
 
-            // make sure to have the zip code you need to run the test
-            context.Add(new ZipCode {City = city, Code = zipCode});
-            context.SaveChanges();
+            // action
+            using (var context = new GTLContext(options))
+            {
+                var addressController = ControllerFactory.CreateAddressController(context);
 
-            var addressController = ControllerFactory.CreateAddressController(context);
-
-            Assert.Throws<ArgumentOutOfRangeException>(() =>
-                addressController.Create(street, additionalInfo, zipCode));
+                // assertion
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                    addressController.Create(street, additionalInfo, zip.Code));
+            }
         }
 
         [Test]
         public void CreateThrowsAnArgumentOutOfRangeExceptionWithEmptyAdditionalInfoParam()
         {
-            const string street = "Spobjervej 26";
-            const string additionalInfo = "";
-            const int zipCode = 8000;
-            const string city = "Aarhus";
-
-            Assert.IsTrue(additionalInfo.Length == 0);
-
+            // setup
+            additionalInfo = "";
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("CreateThrowsAnArgumentOutOfRangeExceptionWithEmptyAdditionalInfoParam")
                 .Options;
 
-            using var context = new GTLContext(options);
+            using (var context = new GTLContext(options))
+            {
+                context.Add(zip);
+                context.SaveChanges();
+            }
 
-            // make sure to have the zip code you need to run the test
-            context.Add(new ZipCode {City = city, Code = zipCode});
-            context.SaveChanges();
+            // action
+            using (var context = new GTLContext(options))
+            {
+                var addressController = ControllerFactory.CreateAddressController(context);
 
-            var addressController = ControllerFactory.CreateAddressController(context);
-
-            Assert.Throws<ArgumentOutOfRangeException>(() =>
-                addressController.Create(street, additionalInfo, zipCode));
+                // assertion
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                    addressController.Create(street, additionalInfo, zip.Code));
+            }
         }
 
         [Test]
         public void CreateThrowsAnArgumentExceptionWithAZipThatDoesNotExist()
         {
-            const string street = "Spobjervej 26";
-            const string additionalInfo = "1.4";
-            // don't create zip in this test
-            const int zipCode = 8000;
-            const string city = "Aarhus";
-
+            // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("CreateThrowsAnArgumentExceptionWithAZipThatDoesNotExist")
                 .Options;
 
+            // action
             using var context = new GTLContext(options);
             var addressController = ControllerFactory.CreateAddressController(context);
 
+            // assertion
             Assert.Throws<ArgumentException>(() =>
-                addressController.Create(street, additionalInfo, zipCode));
+                addressController.Create(street, additionalInfo, zip.Code));
         }
 
         [Test]
         public void FindByIdFindsAnAddressInstance()
         {
-            const string street = "Spobjervej 26";
-            const string additionalInfo = "1.4";
-            const int zipCode = 8000;
-            const string city = "Aarhus";
-
-
+            // setup
+            int addressId;
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("FindByIdFindsAnAddressInstance")
                 .Options;
 
-            using var context = new GTLContext(options);
-            var addressController = ControllerFactory.CreateAddressController(context);
-
-            // insert zip code
-            context.ZipCodes.Add(new ZipCode {Code = zipCode, City = city});
-            // insert address
-            var insertedAddress = context.Addresses.Add(new Address
+            using (var context = new GTLContext(options))
             {
-                AdditionalInfo = additionalInfo,
-                Street = street,
-                ZipCode = zipCode,
-            });
-            context.SaveChanges();
+                var address = new Address
+                {
+                    AdditionalInfo = additionalInfo,
+                    Street = street,
+                    Zip = zip,
+                };
 
-            var address = addressController.FindByID(insertedAddress.Entity.AddressId);
+                context.Add(address);
+                context.SaveChanges();
 
-            Assert.That(address, Has
-                .Property("Street").EqualTo(street).And
-                .Property("AdditionalInfo").EqualTo(additionalInfo).And
-                .Property("Zip"));
+                addressId = address.AddressId;
+            }
+
+            // action
+            using (var context = new GTLContext(options))
+            {
+                var addressController = ControllerFactory.CreateAddressController(context);
+                var address = addressController.FindByID(addressId);
+
+                // assertion
+                Assert.That(address, Has
+                    .Property("Street").EqualTo(street).And
+                    .Property("AdditionalInfo").EqualTo(additionalInfo).And
+                    .Property("Zip"));
+            }
         }
 
         [Test]
         public void FindByIdDoesNotFindAnInstance()
         {
-            const string street = "Spobjervej 26";
-            const string additionalInfo = "1.4";
-            const int zipCode = 8000;
-            const string city = "Aarhus";
-
-
+            // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase("FindByIdDoesNotFindAnInstance")
                 .Options;
 
+            // action
             using var context = new GTLContext(options);
             var addressController = ControllerFactory.CreateAddressController(context);
+            // some random number, doesn't matter what, DB should be empty
+            var address = addressController.FindByID(42);
 
-            // insert zip code
-            context.ZipCodes.Add(new ZipCode {Code = zipCode, City = city});
-            // insert address
-            var insertedAddress = context.Addresses.Add(new Address
-            {
-                AdditionalInfo = additionalInfo,
-                Street = street,
-                ZipCode = zipCode,
-            });
-            context.SaveChanges();
-
-            // find an entity with an incremented ID (make sure there doesn't exist such an entity)
-            var address = addressController.FindByID(insertedAddress.Entity.AddressId + 1);
-
-            Assert.IsNull(address);
+            Assert.That(address, Is.Null);
         }
     }
 }
