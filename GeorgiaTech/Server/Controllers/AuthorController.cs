@@ -7,61 +7,120 @@ namespace Server.Controllers
 {
     public class AuthorController: IAuthorController
     {
-        private readonly GTLContext _context;
+        private readonly GTLContext _db;
 
         public AuthorController(GTLContext context)
         {
-            _context = context;
+            _db = context;
         }
 
         /// <summary>
-        /// Insert method will insert (i.e. save or persist) the author passed.
+        /// Inserts an author entity in the database.
         /// </summary>
-        /// <param name="author">The author object to be saved</param>
-        /// <returns>The same author object but with its ID</returns>
+        /// <param name="author">An author entity instance</param>
+        /// <returns>The updated author entity</returns>
+        /// <exception cref="ArgumentNullException">If the author entity instance is null</exception>
         public Author Insert(Author author)
         {
-            _context.Authors.Add(author);
-            _context.SaveChanges();
+            if (author == null)
+            {
+                throw new ArgumentNullException(nameof(author), "Author object can't be null");
+            }
+
+            _db.Add(author);
+            _db.SaveChanges();
 
             return author;
         }
 
+        /// <summary>
+        /// Finds an author entity by ID
+        /// </summary>
+        /// <param name="ID">The ID to query by</param>
+        /// <returns>The found author entity or null</returns>
         public Author FindByID(int ID)
         {
-            throw new System.NotImplementedException();
+            var author = _db.Authors.Find(ID);
+            return author;
         }
 
+        [Obsolete]
         public Author FindByType(Author t)
         {
             throw new System.NotImplementedException();
         }
 
+        /// <summary>
+        /// Fetches all authors that exist on the database
+        /// </summary>
+        /// <returns>A list of all authors on the database</returns>
+        /// <remarks>NOT TESTED</remarks>
         public List<Author> FindAll()
         {
-            return _context.Authors.Where(a => true).ToList();
-        }
-
-        public Author Update(Author t)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public int Delete(Author t)
-        {
-            throw new System.NotImplementedException();
+            return _db.Authors.ToList();
         }
 
         /// <summary>
-        /// Create method creates an Author object and returns it.
-        ///
-        /// Note: The created author won't be saved to the DB, hence no ID will be assigned to the object.
+        /// Saves any changes made to the context's entities. If no changes are made before the method call
+        /// the method won't do any operations and return null signifying such.
+        /// </summary>
+        /// <param name="author">An author instance that has been changed</param>
+        /// <returns>The author instance passed if changes are saved, null otherwise</returns>
+        /// <remarks>NOT TESTED</remarks>
+        public Author Update(Author author)
+        {
+            if (!_db.ChangeTracker.HasChanges())
+            {
+                return null;
+            }
+
+            _db.SaveChanges();
+            return author;
+        }
+
+        /// <summary>
+        /// Deletes an author entity from the context and applies the removal to the database.
+        /// </summary>
+        /// <param name="author">The author to be removed</param>
+        /// <returns>The number of rows affected on the database</returns>
+        /// <remarks>NOT TESTED</remarks>
+        public int Delete(Author author)
+        {
+            _db.Remove(author);
+            return _db.SaveChanges();
+        }
+
+        /// <summary>
+        /// Creates an Author entity instance and returns it. The firstName and lastName arguments
+        /// can't be empty or longer than 50 characters each.
         /// </summary>
         /// <param name="firstName">The first name of the author</param>
         /// <param name="lastName">The last name of the author</param>
-        /// <returns>The constructed Author object</returns>
+        /// <returns>A new Author instance</returns>
+        /// <exception cref="ArgumentException">Thrown if either the firstName or lastName arguments are empty</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if either the firstName or lastName are longer than 50 characters</exception>
         public Author Create(string firstName, string lastName)
         {
+            if (firstName.Equals(""))
+            {
+                throw new ArgumentException("First name can't be empty");
+            }
+
+            if (lastName.Equals(""))
+            {
+                throw new ArgumentException("Last name can't be empty");
+            }
+
+            if (firstName.Length > 50)
+            {
+                throw new ArgumentOutOfRangeException(nameof(firstName), "First name can't be more than 50 characters");
+            }
+
+            if (lastName.Length > 50)
+            {
+                throw new ArgumentOutOfRangeException(nameof(lastName), "Last name can't be longer than 50 characters");
+            }
+
             var author = new Author
             {
                 FirstName = firstName,
@@ -71,9 +130,17 @@ namespace Server.Controllers
             return author;
         }
 
+        /// <summary>
+        /// Fetches all materials found in the database that are written by the author passed as a parameter
+        /// </summary>
+        /// <param name="author">The author to search by. Must already be inserted in the database</param>
+        /// <returns>A list of all materials found that are written by the author (could be an empty list)</returns>
         public List<Material> FindMaterials(Author author)
         {
-            throw new System.NotImplementedException();
+            return _db.Materials
+                .Where(m => m.MaterialAuthors
+                    .Any(ma => ma.AuthorId == author.AuthorId))
+                .ToList();
         }
     }
 }
