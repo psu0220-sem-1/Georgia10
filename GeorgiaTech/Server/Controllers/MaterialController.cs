@@ -25,17 +25,12 @@ namespace Server.Controllers
             throw new NotImplementedException();
         }
 
-        public Material FindByType(Material t)
-        {
-            throw new NotImplementedException();
-        }
-
         public Material Insert(Material t)
         {
             throw new NotImplementedException();
         }
 
-        public Material Update(Material t)
+        public int Update(Material t)
         {
             throw new NotImplementedException();
         }

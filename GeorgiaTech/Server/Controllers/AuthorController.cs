@@ -45,12 +45,6 @@ namespace Server.Controllers
             return author;
         }
 
-        [Obsolete]
-        public Author FindByType(Author t)
-        {
-            throw new System.NotImplementedException();
-        }
-
         /// <summary>
         /// Fetches all authors that exist on the database
         /// </summary>
@@ -68,17 +62,16 @@ namespace Server.Controllers
         /// <param name="author">An author instance that has been changed</param>
         /// <returns>The author instance passed if changes are saved, null otherwise</returns>
         /// <remarks>NOT TESTED</remarks>
-        public Author Update(Author author)
+        public int Update(Author author)
         {
             if (!_db.ChangeTracker.HasChanges())
-                return null;
+                return 0;
 
             int changedRows;
             using var transaction = _db.Database.BeginTransaction();
 
             try
             {
-                // TODO: return changed rows once IController's Update method signature has been updated
                 changedRows = _db.SaveChanges();
                 transaction.Commit();
             }
@@ -88,7 +81,7 @@ namespace Server.Controllers
                 throw;
             }
 
-            return author;
+            return changedRows;
         }
 
         /// <summary>

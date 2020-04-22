@@ -15,17 +15,12 @@ namespace Server.Controllers
             throw new System.NotImplementedException();
         }
 
-        public Address FindByType(Address t)
-        {
-            throw new System.NotImplementedException();
-        }
-
         public List<Address> FindAll()
         {
             throw new System.NotImplementedException();
         }
 
-        public Address Update(Address t)
+        public int Update(Address t)
         {
             throw new System.NotImplementedException();
         }
