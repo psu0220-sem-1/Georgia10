@@ -1,5 +1,5 @@
 ﻿/// <summary>
-/// IController is the toplevel interface which the functional controllers inherit from. 
+/// IController is the toplevel interface which the functional controllers inherit from.
 /// </summary>
 using System;
 using System.Collections.Generic;
@@ -11,9 +11,8 @@ namespace Server.Controllers
     {
         public T Insert(T t);
         public T FindByID(int ID);
-        public T FindByType(T t);
         public List<T> FindAll();
-        public T Update(T t);
+        public int Update(T t);
         public int Delete(T t);
     }
 }
