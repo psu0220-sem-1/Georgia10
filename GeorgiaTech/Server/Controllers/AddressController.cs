@@ -30,17 +30,12 @@ namespace Server.Controllers
             return _db.Addresses.Find(ID);
         }
 
-        public Address FindByType(Address t)
-        {
-            throw new System.NotImplementedException();
-        }
-
         public List<Address> FindAll()
         {
             throw new System.NotImplementedException();
         }
 
-        public Address Update(Address t)
+        public int Update(Address t)
         {
             throw new System.NotImplementedException();
         }

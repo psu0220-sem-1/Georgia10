@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using Server.Models;
 
 namespace Server.Controllers
@@ -44,12 +45,6 @@ namespace Server.Controllers
             return author;
         }
 
-        [Obsolete]
-        public Author FindByType(Author t)
-        {
-            throw new System.NotImplementedException();
-        }
-
         /// <summary>
         /// Fetches all authors that exist on the database
         /// </summary>
@@ -67,15 +62,26 @@ namespace Server.Controllers
         /// <param name="author">An author instance that has been changed</param>
         /// <returns>The author instance passed if changes are saved, null otherwise</returns>
         /// <remarks>NOT TESTED</remarks>
-        public Author Update(Author author)
+        public int Update(Author author)
         {
             if (!_db.ChangeTracker.HasChanges())
+                return 0;
+
+            int changedRows;
+            using var transaction = _db.Database.BeginTransaction();
+
+            try
             {
-                return null;
+                changedRows = _db.SaveChanges();
+                transaction.Commit();
+            }
+            catch (DbUpdateException)
+            {
+                transaction.Rollback();
+                throw;
             }
 
-            _db.SaveChanges();
-            return author;
+            return changedRows;
         }
 
         /// <summary>
@@ -86,8 +92,21 @@ namespace Server.Controllers
         /// <remarks>NOT TESTED</remarks>
         public int Delete(Author author)
         {
-            _db.Remove(author);
-            return _db.SaveChanges();
+            int changedRows;
+            using var transaction = _db.Database.BeginTransaction();
+
+            try
+            {
+                _db.Remove(author);
+                changedRows = _db.SaveChanges();
+            }
+            catch (DbUpdateException)
+            {
+                transaction.Rollback();
+                throw; // rethrow
+            }
+
+            return changedRows;
         }
 
         /// <summary>
