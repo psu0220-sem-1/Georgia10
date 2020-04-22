@@ -47,12 +47,6 @@ namespace Server.Controllers
             return address;
         }
 
-        [Obsolete]
-        public Address FindByType(Address t)
-        {
-            throw new System.NotImplementedException();
-        }
-
         /// <summary>
         /// Returns a list of all addresses saved on the database
         /// </summary>
@@ -70,10 +64,10 @@ namespace Server.Controllers
         /// <param name="address">An address instance that will be updated</param>
         /// <returns>The address instance passed if changes are saved, null otherwise</returns>
         /// <remarks>Not tested</remarks>
-        public Address Update(Address address)
+        public int Update(Address address)
         {
             if (!_db.ChangeTracker.HasChanges())
-                return null;
+                return 0;
 
             int changedRows;
             using var transaction = _db.Database.BeginTransaction();
@@ -90,7 +84,7 @@ namespace Server.Controllers
                 throw; // rethrow
             }
 
-            return address;
+            return changedRows;
         }
 
         /// <summary>
