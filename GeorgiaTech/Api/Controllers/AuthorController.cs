@@ -89,5 +89,16 @@ namespace Api.Controllers
 
             return new OkResult();
         }
+
+        [HttpGet("{authorId:int}/materials")]
+        public IActionResult GetAuthorMaterials(int authorId)
+        {
+            var author = _controller.FindByID(authorId);
+            if (author == null)
+                return new NotFoundResult();
+
+            var materials = _controller.FindMaterials(author);
+            return new JsonResult(materials);
+        }
     }
 }
