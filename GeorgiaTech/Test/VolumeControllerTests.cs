@@ -11,10 +11,12 @@ namespace Test
     [TestFixture]
     public class VolumeControllerTests
     {
+        [SetUp]
         public void Setup()
         {
 
         }
+
         [Test]
         public void InsertInsertsCorrectly()
         {
@@ -43,6 +45,25 @@ namespace Test
                     .EqualTo(currentLocationId)
                     );
             }
+        }
+
+        [Test]
+        public void CreateWithNonExistingDataThrowsInvalidOperationException()
+        {
+            var options = new DbContextOptionsBuilder<GTLContext>().UseInMemoryDatabase("InsertInsertsCorrectly").Options;
+            
+            var materialId = 1;
+            var homeLocationId = 1;
+            var currentLocationId = 1;
+            
+            using (var context = new GTLContext(options))
+            {
+                var volumeController = ControllerFactory.CreateVolumeController(context);
+
+                Assert.Throws<InvalidOperationException>(() => volumeController.Create(materialId, homeLocationId, currentLocationId));
+
+            }
+
         }
     }
 }
