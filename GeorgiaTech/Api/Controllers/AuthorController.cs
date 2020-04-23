@@ -43,7 +43,12 @@ namespace Api.Controllers
                 return new BadRequestResult();
 
             var author = _controller.Create(authorData.FirstName, authorData.LastName);
-            _controller.Insert(author);
+            var rowsChanged = _controller.Insert(author);
+            if (rowsChanged != 1)
+            {
+                // log error, maybe even stop the program as it's in an inconsistent state?
+                return new StatusCodeResult(500);
+            }
 
             var uri = new Uri($"http://{Request.Host}/api/author/{author.AuthorId}");
 

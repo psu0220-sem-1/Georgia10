@@ -21,7 +21,7 @@ namespace Server.Controllers
         /// <param name="author">An author entity instance</param>
         /// <returns>The updated author entity</returns>
         /// <exception cref="ArgumentNullException">If the author entity instance is null</exception>
-        public Author Insert(Author author)
+        public int Insert(Author author)
         {
             if (author == null)
             {
@@ -29,9 +29,9 @@ namespace Server.Controllers
             }
 
             _db.Add(author);
-            _db.SaveChanges();
+            var changedRows = _db.SaveChanges();
 
-            return author;
+            return changedRows;
         }
 
         /// <summary>

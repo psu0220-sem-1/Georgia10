@@ -5,7 +5,7 @@ namespace Server.Controllers
 {
     public class AddressController: IAddressController
     {
-        public Address Insert(Address t)
+        public int Insert(Address t)
         {
             throw new System.NotImplementedException();
         }
