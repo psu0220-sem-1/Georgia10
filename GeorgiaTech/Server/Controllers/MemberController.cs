@@ -8,11 +8,12 @@ namespace Server.Controllers
     public class MemberController : IMemberController
     {
         static GTLContext db;
-        IAddressController addressController = ControllerFactory.CreateAddressController(db);
-
+        IAddressController addressController;
         public MemberController(GTLContext context)
         {
             db = context;
+            addressController = ControllerFactory.CreateAddressController(db);
+
         }
 
         public Member Create(string SSN, string fName, string lName, string homeAddress, string campusAddress, int zip, string homeAddressAdditionalInfo, List<MemberType> memberTypes)

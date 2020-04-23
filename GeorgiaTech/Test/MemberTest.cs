@@ -15,15 +15,15 @@ namespace Test
     [TestFixture]
     public class MemberTest
     {
-        string fName = "";
-        string lName = "";
+        string fName = "Anders";
+        string lName = "And";
         string ssn = "250-57-9705";
         string homeAddres = "Annemosevej";
         string campusAddress = "Sofiendalsvej 60";
-        string homeAddressAdditionalInfo = "";
-        int zip = 8858;
+        string homeAddressAdditionalInfo = "None available";
+        int zip = 30002;
         List<MemberType> mTypes = new List<MemberType>();
-        Member member;
+        
         
         
         [SetUp]
@@ -63,16 +63,28 @@ namespace Test
             
             //setup the options for the DbContext.
             DbContextOptions<GTLContext> options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase(callingMethod)
+                .UseInMemoryDatabase(callingMethod).EnableSensitiveDataLogging(true)
                 .Options;
             Console.WriteLine(callingMethod);
             return options;
+        }
+        /// <summary>
+        /// Insert dummy data into database.
+        /// </summary>
+        /// <returns></returns>
+        private void InsertZips(GTLContext db)
+        {
+            ZipCode zipCode = new ZipCode();
+            zipCode.City = "Georgia";
+            zipCode.Code = zip;
+            db.Add(zipCode);
+            db.SaveChanges();
         }
         [Test]
         public void InsertMemberIntoDatabase()
         {
             using var context = new GTLContext(SetupInMemoryDatabase());
-
+            InsertZips(context);
             //as long as dbContext is needed for initializing controller. this can't easily be extracted - so it must be in each method. 
             IMemberController mController = ControllerFactory.CreateMemberController(context);
             var member = mController.Create(ssn, fName, lName, homeAddres, campusAddress, zip, homeAddressAdditionalInfo, mTypes);
