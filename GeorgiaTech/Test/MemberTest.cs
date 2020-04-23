@@ -33,17 +33,15 @@ namespace Test
             //MemberTypes:
             MemberType student = new MemberType()
             {
-                TypeId = 0,
+                
                 TypeName = "Student"
             };
             MemberType staff = new MemberType()
             {
-                TypeId = 1,
                 TypeName = "Staff"
             };
             MemberType faculty = new MemberType()
             {
-                TypeId = 2,
                 TypeName = "Faculty"
             };
            
@@ -72,19 +70,20 @@ namespace Test
         /// Insert dummy data into database.
         /// </summary>
         /// <returns></returns>
-        private void InsertZips(GTLContext db)
+        private void InsertDummyData(GTLContext db)
         {
             ZipCode zipCode = new ZipCode();
             zipCode.City = "Georgia";
             zipCode.Code = zip;
             db.Add(zipCode);
+            db.MemberTypes.AddRange(mTypes);
             db.SaveChanges();
         }
         [Test]
         public void InsertMemberIntoDatabase()
         {
             using var context = new GTLContext(SetupInMemoryDatabase());
-            InsertZips(context);
+            InsertDummyData(context);
             //as long as dbContext is needed for initializing controller. this can't easily be extracted - so it must be in each method. 
             IMemberController mController = ControllerFactory.CreateMemberController(context);
             var member = mController.Create(ssn, fName, lName, homeAddres, campusAddress, zip, homeAddressAdditionalInfo, mTypes);
@@ -92,7 +91,7 @@ namespace Test
             //action
             mController.Insert(member);
             //Assertation:
-            Assert.That(member, Has.Property("FirstName").EqualTo(member.FName).And.Property("LastName").EqualTo(member.LName)
+            Assert.That(member, Has.Property("FName").EqualTo(member.FName).And.Property("LName").EqualTo(member.LName)
                 );
 
         }
