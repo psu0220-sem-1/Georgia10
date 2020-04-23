@@ -29,7 +29,7 @@ namespace Server.Controllers
             return _context.Materials.Single(m => m.MaterialId == ID);
         }
 
-        public Material Insert(Material t)
+        public int Insert(Material t)
         {
             throw new NotImplementedException();
         }
