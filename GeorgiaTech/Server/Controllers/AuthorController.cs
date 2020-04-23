@@ -99,6 +99,7 @@ namespace Server.Controllers
             {
                 _db.Remove(author);
                 changedRows = _db.SaveChanges();
+                transaction.Commit();
             }
             catch (DbUpdateException)
             {
