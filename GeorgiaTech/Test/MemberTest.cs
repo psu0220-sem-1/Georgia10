@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace Test
 {
-    //TestFixture marks the file as containing tests.
+    
     [TestFixture]
     public class MemberTest
     {
@@ -24,12 +24,12 @@ namespace Test
         int zip = 8858;
         List<MemberType> mTypes = new List<MemberType>();
         Member member;
-        //To avoid setting these things up each time.
+        
         
         [SetUp]
         public void Setup()
         {
-            //gonna need to assign dbContext somewhere / somehow.
+            
             //MemberTypes:
             MemberType student = new MemberType()
             {
@@ -46,7 +46,7 @@ namespace Test
                 TypeId = 2,
                 TypeName = "Faculty"
             };
-            List<MemberType> memberTypes = new List<MemberType>();
+           
             mTypes.Add(student);
             mTypes.Add(staff);
             mTypes.Add(faculty);
@@ -62,17 +62,15 @@ namespace Test
             string callingMethod = stackTrace.GetFrame(1).GetMethod().Name;
             
             //setup the options for the DbContext.
-            //Hopefully it wont be closed when this method ends, but rather when the using statement that called it ends.
             DbContextOptions<GTLContext> options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase(callingMethod)
                 .Options;
-            //type to be returned.
+            Console.WriteLine(callingMethod);
             return options;
         }
         [Test]
         public void InsertMemberIntoDatabase()
         {
-            //Call this each test. Dont worry about TearDown, it happens when the method has finished executing.
             using var context = new GTLContext(SetupInMemoryDatabase());
 
             //as long as dbContext is needed for initializing controller. this can't easily be extracted - so it must be in each method. 
