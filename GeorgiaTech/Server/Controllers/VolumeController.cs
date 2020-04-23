@@ -20,14 +20,14 @@ namespace Server.Controllers
 
         }
 
-        public Volume Create(int materialID, int homeLocationID, int currentLocationID)
+        public Volume Create(int materialId, int homeLocationId, int currentLocationId)
         {
      
             try
             {
-                var material = materialController.FindByID(materialID);
-                var homeLocation = addressController.FindByID(homeLocationID);
-                var currentLocation = addressController.FindByID(currentLocationID);
+                var material = materialController.FindByID(materialId);
+                var homeLocation = addressController.FindByID(homeLocationId);
+                var currentLocation = addressController.FindByID(currentLocationId);
 
                 var newVolume = new Volume { Material = material, CurrentLocation = currentLocation, HomeLocation = homeLocation };
                 return newVolume;
@@ -126,9 +126,26 @@ namespace Server.Controllers
             return volume;
         }
 
-        public Volume Update(Volume t)
+        public int Update(Volume t)
         {
-            throw new NotImplementedException();
+            if (!_context.ChangeTracker.HasChanges())
+                return 0;
+
+            int changedRows;
+            using var transaction = _context.Database.BeginTransaction();
+
+            try
+            {
+                changedRows = _context.SaveChanges();
+                transaction.Commit();
+            }
+            catch (DbUpdateException)
+            {
+                transaction.Rollback();
+                throw;
+            }
+
+            return changedRows;
         }
     }
 }
