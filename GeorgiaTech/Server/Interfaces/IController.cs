@@ -9,7 +9,7 @@ namespace Server.Controllers
 {
     public interface IController<T>
     {
-        public T Insert(T t);
+        public int Insert(T t);
         public T FindByID(int ID);
         public List<T> FindAll();
         public int Update(T t);

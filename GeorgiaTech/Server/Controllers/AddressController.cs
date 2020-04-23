@@ -22,7 +22,7 @@ namespace Server.Controllers
         /// <returns>The same address entity with its new ID assigned</returns>
         /// <exception cref="ArgumentNullException">If address parameter is null</exception>
         /// <remarks>Not tested</remarks>
-        public Address Insert(Address address)
+        public int Insert(Address address)
         {
             if (address == null)
             {
@@ -30,9 +30,9 @@ namespace Server.Controllers
             }
 
             _db.Add(address);
-            _db.SaveChanges();
+            var changedRows = _db.SaveChanges();
 
-            return address;
+            return changedRows;
         }
 
         /// <summary>
