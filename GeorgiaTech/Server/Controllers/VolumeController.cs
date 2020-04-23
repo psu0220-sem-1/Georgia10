@@ -20,6 +20,13 @@ namespace Server.Controllers
 
         }
 
+        /// <summary>
+        /// Create a volume entity object
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <param name="homeLocationId"></param>
+        /// <param name="currentLocationId"></param>
+        /// <returns>The created volume</returns>
         public Volume Create(int materialId, int homeLocationId, int currentLocationId)
         {
      
@@ -39,13 +46,35 @@ namespace Server.Controllers
             }
         
         }
-
-        public int Delete(Volume t)
+        /// <summary>
+        /// Deletes a volume entry from the database
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns>The number of rows changed</returns>
+        public int Delete(Volume volume)
         {
-            _context.Remove(t);
-            return _context.SaveChanges(); ;
+            using var transaction = _context.Database.BeginTransaction();
+
+            try
+            {
+                _context.Remove(volume);
+                var changedRows = _context.SaveChanges();
+                transaction.Commit();
+                return changedRows;
+
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+
+            }
         }
 
+        /// <summary>
+        /// Find all the volumes in the database
+        /// </summary>
+        /// <returns>A list of volumes</returns>
         public List<Volume> FindAll()
         {
             IQueryable<Volume> volumes = _context.Volumes
@@ -63,6 +92,11 @@ namespace Server.Controllers
             return volumes.ToList();
         }
 
+        /// <summary>
+        /// Find all volumes for a specific material
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns>A list of volumes for the specified material</returns>
         public List<Volume> FindVolumesForMaterial(int materialId)
         {
             try
@@ -119,6 +153,11 @@ namespace Server.Controllers
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Inster a volume to the database
+        /// </summary>
+        /// <param name="volume"></param>
+        /// <returns>The number of rows changed</returns>
         public Volume Insert(Volume volume)
         {
             _context.Volumes.Add(volume);
@@ -126,7 +165,12 @@ namespace Server.Controllers
             return volume;
         }
 
-        public int Update(Volume t)
+        /// <summary>
+        /// Updates a volume entity in the database
+        /// </summary>
+        /// <param name="volume"></param>
+        /// <returns>The number of rows changed</returns>
+        public int Update(Volume volume)
         {
             if (!_context.ChangeTracker.HasChanges())
                 return 0;
