@@ -5,6 +5,6 @@ namespace Server.Controllers
 {
     public interface IVolumeController: IController<Volume>
     {
-
+        public Volume Create(int materialId, int homeLocationId, int currentLocationId);
     }
 }
