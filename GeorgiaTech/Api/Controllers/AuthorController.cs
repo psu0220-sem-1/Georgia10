@@ -18,6 +18,10 @@ namespace Api.Controllers
             _controller = ControllerFactory.CreateAuthorController(context);
         }
 
+        /// <summary>
+        /// Returns all authors saved on the system
+        /// </summary>
+        /// <returns>A JSON representation of the authors</returns>
         [HttpGet]
         public IActionResult GetAuthors()
         {
@@ -25,6 +29,11 @@ namespace Api.Controllers
             return new JsonResult(authors);
         }
 
+        /// <summary>
+        /// Returns a single author identified by its ID
+        /// </summary>
+        /// <param name="id">The author's ID</param>
+        /// <returns>JSON representation of the author</returns>
         [HttpGet("{id:int}")]
         public IActionResult GetAuthor(int id)
         {
@@ -36,6 +45,11 @@ namespace Api.Controllers
             return new JsonResult(author);
         }
 
+        /// <summary>
+        /// Creates and saves an author
+        /// </summary>
+        /// <param name="authorData">Author's data</param>
+        /// <returns>A JSON representation of the created author</returns>
         [HttpPost]
         public IActionResult CreateAuthor([FromBody] Author authorData)
         {
@@ -51,10 +65,15 @@ namespace Api.Controllers
             }
 
             var uri = new Uri($"http://{Request.Host}/api/author/{author.AuthorId}");
-
             return new CreatedResult(uri, author);
         }
 
+        /// <summary>
+        /// Updates an author
+        /// </summary>
+        /// <param name="id">The author's current ID</param>
+        /// <param name="authorData">The author's new data. No fields are required. Skipped fields won't be updated</param>
+        /// <returns>A JSON representation of the updated author</returns>
         [HttpPut("{id:int}")]
         public IActionResult UpdateAuthor(int id, [FromBody] Author authorData)
         {
@@ -78,6 +97,11 @@ namespace Api.Controllers
             return new JsonResult(author);
         }
 
+        /// <summary>
+        /// Deletes an author
+        /// </summary>
+        /// <param name="id">The author's ID</param>
+        /// <returns>200 OK if deletion was successful or 404 if author doesn't exist</returns>
         [HttpDelete("{id:int}")]
         public IActionResult DeleteAuthor(int id)
         {
@@ -95,6 +119,11 @@ namespace Api.Controllers
             return new OkResult();
         }
 
+        /// <summary>
+        /// Fetches a list of all materials by a specific author
+        /// </summary>
+        /// <param name="authorId">The author's ID</param>
+        /// <returns>A JSON representation of a list of all materials by that author</returns>
         [HttpGet("{authorId:int}/materials")]
         public IActionResult GetAuthorMaterials(int authorId)
         {
