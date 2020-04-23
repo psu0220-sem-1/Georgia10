@@ -25,7 +25,7 @@ namespace Server.Controllers
             throw new NotImplementedException();
         }
 
-        public Material Insert(Material t)
+        public int Insert(Material t)
         {
             throw new NotImplementedException();
         }
