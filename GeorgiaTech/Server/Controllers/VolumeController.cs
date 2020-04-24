@@ -158,11 +158,10 @@ namespace Server.Controllers
         /// </summary>
         /// <param name="volume"></param>
         /// <returns>The number of rows changed</returns>
-        public Volume Insert(Volume volume)
+        public int Insert(Volume volume)
         {
             _context.Volumes.Add(volume);
-            _context.SaveChanges();
-            return volume;
+            return _context.SaveChanges();
         }
 
         /// <summary>
