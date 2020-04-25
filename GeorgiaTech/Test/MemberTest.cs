@@ -24,16 +24,12 @@ namespace Test
         int zip = 30002;
         List<MemberType> mTypes = new List<MemberType>();
 
-
-
-        [SetUp]
-        public void Setup()
+        [OneTimeSetUp]
+        public void SetupOnce()
         {
-
             //MemberTypes:
             MemberType student = new MemberType()
             {
-
                 TypeName = "Student"
             };
             MemberType staff = new MemberType()
@@ -48,8 +44,11 @@ namespace Test
             mTypes.Add(student);
             mTypes.Add(staff);
             mTypes.Add(faculty);
+        }
 
-
+        [SetUp]
+        public void Setup()
+        {
         }
         public DbContextOptions<GTLContext> SetupInMemoryDatabase()
         {
@@ -67,6 +66,7 @@ namespace Test
         
         private void InsertDummyData(GTLContext context)
         {
+
             //this should be passed by reference, and as such work with differnet objects without carrying the data over.
             ZipCode zipCode = new ZipCode
             {
@@ -98,7 +98,7 @@ namespace Test
             }
         }
         [Test]
-        public void SelectMemberWithMatchingName()
+        public void FindByName()
         {
             MethodBase method = MethodBase.GetCurrentMethod();
             DbContextOptions<GTLContext> options = new DbContextOptionsBuilder<GTLContext>()
@@ -122,18 +122,72 @@ namespace Test
                 Assert.That(member, Has.
                     Property("FName").EqualTo(firstName)
                     .And.Property("LName").EqualTo(lastName));
+               var foundMember = mController.FindByName(member.FName);
+                Assert.That(member, Is.EqualTo(foundMember));
             };
         }
         [Test]
         public void UpdateMemberWithNewAddress()
         {
-            throw new NotImplementedException();
+            MethodBase method = MethodBase.GetCurrentMethod();
+            DbContextOptions<GTLContext> options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase(method.Name).EnableSensitiveDataLogging(true)
+                .Options;
+            using (var context = new GTLContext(options))
+            {
+                //setup
+                IMemberController mController = ControllerFactory.CreateMemberController(context);
+                InsertDummyData(context);
+                
+                var member = mController.Create(ssn, fName, lName, homeAddres, campusAddress, zip, homeAddressAdditionalInfo, mTypes);
+                IAddressController aController = ControllerFactory.CreateAddressController(context);
+
+                var newAddress = aController.Create("Blaviken street", "Be careful of the Dog", zip);
+                //Action
+                mController.Insert(member);
+                //--update the member with new info, find it again make sure they are actually updated. 
+                var updatedMember = mController.FindByName(member.FName);
+                updatedMember.HomeAddress = newAddress;
+                mController.Update(updatedMember);
+                member = mController.FindByName(member.FName);
+                Assert.That(member, Is.EqualTo(updatedMember));
+            }
+
         }
         [Test]
         public void UpdateMembertypeOnMember()
         {
-            throw new NotImplementedException();
+            MethodBase method = MethodBase.GetCurrentMethod();
+            DbContextOptions<GTLContext> options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase(method.Name).EnableSensitiveDataLogging(true)
+                .Options;
+            MemberType student = new MemberType()
+            {
+                TypeName = "Student"
+            };
+            MemberType staff = new MemberType()
+            {
+                TypeName = "Staff"
+            };
+            List<MemberType> memberTypes = new List<MemberType>();
+            memberTypes.Add(student);
 
+            using (var context = new GTLContext(options))
+            {
+                //Basic environment.
+                IMemberController mController = ControllerFactory.CreateMemberController(context);
+                InsertDummyData(context);
+                var member = mController.Create(ssn, fName, lName, homeAddres, campusAddress, zip, homeAddressAdditionalInfo, memberTypes);
+
+                mController.Insert(member);
+                memberTypes.Add(staff);
+                //Actions
+                mController.UpdateMembershipsOnMember(member, memberTypes);
+                mController.Update(member);
+                var updatedMember = mController.FindByName(member.FName);
+                //Assertations!
+                Assert.That(member, Is.EqualTo(updatedMember));
+            }
         }
         [Test]
         public void DeleteMemberFromDatabase()
@@ -145,17 +199,15 @@ namespace Test
             using (var context = new GTLContext(options))
             {
                 IMemberController mController = ControllerFactory.CreateMemberController(context);
-                //not flushing the data properly. Not sure why.
                 InsertDummyData(context);
-
                 var member = mController.Create(ssn, fName, lName, homeAddres, campusAddress, zip, homeAddressAdditionalInfo, mTypes);
                 mController.Insert(member);
 
-                Assert.That(member, Has.Property("FName").EqualTo(fName).And.Property("LName").EqualTo(lName)
-                );
-                //remove the member again
+                //remove the member again. This crurrently doesn't work due to a lack of cascacing action.
                 mController.Delete(member);
-
+                var foundMember = mController.FindByName(member.FName);
+                //A null should have been returned as the member doesn't exist.
+                Assert.IsNull(foundMember);
             }
 
         }
