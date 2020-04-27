@@ -5,6 +5,7 @@ using System.Linq;
 using Server.Controllers;
 using Server;
 using Server.Models;
+using System.Reflection;
 
 namespace Test
 {
@@ -20,7 +21,8 @@ namespace Test
         [Test]
         public void InsertInsertsCorrectly()
         {
-            var options = new DbContextOptionsBuilder<GTLContext>().UseInMemoryDatabase("InsertInsertsCorrectly").Options;
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            var options = new DbContextOptionsBuilder<GTLContext>().UseInMemoryDatabase(methodName).Options;
             var materialId = 1;
             var homeLocationId = 1;
             var currentLocationId = 1;
@@ -50,7 +52,8 @@ namespace Test
         [Test]
         public void CreateWithNonExistingDataThrowsInvalidOperationException()
         {
-            var options = new DbContextOptionsBuilder<GTLContext>().UseInMemoryDatabase("InsertInsertsCorrectly").Options;
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            var options = new DbContextOptionsBuilder<GTLContext>().UseInMemoryDatabase(methodName).Options;
             
             var materialId = 1;
             var homeLocationId = 1;
