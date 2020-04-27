@@ -29,7 +29,7 @@ namespace Server.Controllers
 
         public static IMemberController CreateMemberController(GTLContext context)
         {
-            return new MemberController();
+            return new MemberController(context);
         }
 
         /*
