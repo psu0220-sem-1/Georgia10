@@ -214,18 +214,67 @@ namespace Test
         [Test]
         public void AddMemberShipToMember()
         {
-            throw new NotImplementedException();
+            MethodBase method = MethodBase.GetCurrentMethod();
+            DbContextOptions<GTLContext> options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase(method.Name).EnableSensitiveDataLogging(true)
+                .Options;
 
+            using (var context = new GTLContext(options))
+            {
+                IMemberController mController = ControllerFactory.CreateMemberController(context);
+                InsertDummyData(context);
+                MemberType teachingAssistant = new MemberType()
+                {
+                    TypeName = "Teaching Assistant"
+                };
+                var member = mController.Create(ssn, fName, lName, homeAddres, campusAddress, zip, homeAddressAdditionalInfo, mTypes);
+                mController.Insert(member);
+
+                mTypes.Add(teachingAssistant);
+                member.Memberships = mController.UpdateMembershipsOnMember(member, mTypes);
+                mController.Update(member);
+                Assert.That(member,
+                    Is.EqualTo(mController.FindByName(member.FName)));
+            }
+           
         }
         [Test]
         public void GetMembershipsOfMember()
         {
-           throw new NotImplementedException();
+            MethodBase method = MethodBase.GetCurrentMethod();
+            DbContextOptions<GTLContext> options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase(method.Name).EnableSensitiveDataLogging(true)
+                .Options;
+            using (var context = new GTLContext(options))
+            {
+                 IMemberController mController = ControllerFactory.CreateMemberController(context);
+                InsertDummyData(context);
+                var member = mController.Create(ssn, fName, lName, homeAddres, campusAddress, zip, homeAddressAdditionalInfo, mTypes);
+                mController.Insert(member);
+                //This only checks that the numbers of memberships on the member is correct. It does not check what the individual ones are.
+                Assert.That(member.Memberships.Count, Is.EqualTo(mTypes.Count));
+
+            }
 
         }
+        //This will be implemented later when dummy data has been generated.
+        //TODO!
         [Test]
         public void FindAllMembersByType()
         {
+            MethodBase method = MethodBase.GetCurrentMethod();
+            DbContextOptions<GTLContext> options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase(method.Name).EnableSensitiveDataLogging(true)
+                .Options;
+            using (var context = new GTLContext(options))
+            {
+                 IMemberController mController = ControllerFactory.CreateMemberController(context);
+                InsertDummyData(context);
+                var member = mController.Create(ssn, fName, lName, homeAddres, campusAddress, zip, homeAddressAdditionalInfo, mTypes);
+                mController.Insert(member);
+
+
+            }
             throw new NotImplementedException();
 
         }
