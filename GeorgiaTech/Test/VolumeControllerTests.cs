@@ -35,13 +35,13 @@ namespace Test
             {
                 var insertedVolume = context.Volumes.FirstOrDefault(v => v.MaterialId == materialId && v.CurrentLocationId == currentLocationId && v.HomeLocationId == homeLocationId);
                 Assert.That(insertedVolume, Has
-                    .Property("MaterialId")
+                    .Property(nameof(Volume.MaterialId))
                     .EqualTo(materialId)
                     .And
-                    .Property("HomeLocationId")
+                    .Property(nameof(Volume.HomeLocationId))
                     .EqualTo(homeLocationId)
                     .And
-                    .Property("CurrentLocationId")
+                    .Property(nameof(Volume.CurrentLocationId))
                     .EqualTo(currentLocationId)
                     );
             }
