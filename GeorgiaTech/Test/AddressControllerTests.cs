@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using Server;
@@ -28,7 +29,7 @@ namespace Test
         {
             // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("CreateCreatesCorrectAddressInstance")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
 
             using (var context = new GTLContext(options))
@@ -45,9 +46,9 @@ namespace Test
 
                 // assertion
                 Assert.That(address, Has
-                    .Property("Street").EqualTo(street).And
-                    .Property("AdditionalInfo").EqualTo(additionalInfo).And
-                    .Property("Zip"));
+                    .Property(nameof(Address.Street)).EqualTo(street).And
+                    .Property(nameof(Address.AdditionalInfo)).EqualTo(additionalInfo).And
+                    .Property(nameof(Address.Zip)));
             }
         }
 
@@ -57,7 +58,7 @@ namespace Test
             // setup
             street = "";
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("CreateThrowsAnArgumentOutOfRangeExceptionWithEmptyStreetParam")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
 
             using (var context = new GTLContext(options))
@@ -83,7 +84,7 @@ namespace Test
             // setup
             additionalInfo = "";
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("CreateThrowsAnArgumentOutOfRangeExceptionWithEmptyAdditionalInfoParam")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
 
             using (var context = new GTLContext(options))
@@ -108,7 +109,7 @@ namespace Test
         {
             // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("CreateThrowsAnArgumentExceptionWithAZipThatDoesNotExist")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
 
             // action
@@ -126,7 +127,7 @@ namespace Test
             // setup
             int addressId;
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("FindByIdFindsAnAddressInstance")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
 
             using (var context = new GTLContext(options))
@@ -152,9 +153,9 @@ namespace Test
 
                 // assertion
                 Assert.That(address, Has
-                    .Property("Street").EqualTo(street).And
-                    .Property("AdditionalInfo").EqualTo(additionalInfo).And
-                    .Property("Zip"));
+                    .Property(nameof(Address.Street)).EqualTo(street).And
+                    .Property(nameof(Address.AdditionalInfo)).EqualTo(additionalInfo).And
+                    .Property(nameof(Address.Zip)));
             }
         }
 
@@ -163,7 +164,7 @@ namespace Test
         {
             // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("FindByIdDoesNotFindAnInstance")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
 
             // action

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using Server;
@@ -57,7 +58,7 @@ namespace Test
         {
             // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("CreateCreatesCorrectAuthorInstance")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
@@ -67,8 +68,8 @@ namespace Test
 
             // assertion
             Assert.That(author, Has
-                .Property("FirstName").EqualTo(authorFirstName).And
-                .Property("LastName").EqualTo(authorLastName));
+                .Property(nameof(Author.FirstName)).EqualTo(authorFirstName).And
+                .Property(nameof(Author.LastName)).EqualTo(authorLastName));
         }
 
         [Test]
@@ -77,7 +78,7 @@ namespace Test
             // setup
             authorFirstName = "123456789012345678901234567890123456789012345678901";
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("CreateThrowsArgumentOutOfRangeExceptionWithFirstNameLongerThan50")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
@@ -94,7 +95,7 @@ namespace Test
             // setup
             authorFirstName = "";
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("CreateThrowsArgumentExceptionWithEmptyFirstNameArgument")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
@@ -110,7 +111,7 @@ namespace Test
             // setup
             authorLastName = "123456789012345678901234567890123456789012345678901";
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("CreateThrowsArgumentOutOfRangeExceptionWithLastNameLongerThan50")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
@@ -126,7 +127,7 @@ namespace Test
             // setup
             authorLastName = "";
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("CreateThrowsArgumentExceptionWithEmptyLastNameArgument")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
@@ -141,7 +142,7 @@ namespace Test
         {
             // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("InsertInsertsCorrectly")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
 
             // action
@@ -160,8 +161,8 @@ namespace Test
                     .FirstOrDefault(a => a.FirstName == authorFirstName && a.LastName == authorLastName);
 
                 Assert.That(fetchedAuthor, Has
-                    .Property("FirstName").EqualTo(authorFirstName).And
-                    .Property("LastName").EqualTo(authorLastName));
+                    .Property(nameof(Author.FirstName)).EqualTo(authorFirstName).And
+                    .Property(nameof(Author.LastName)).EqualTo(authorLastName));
             }
         }
 
@@ -170,7 +171,7 @@ namespace Test
         {
             // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("InsertThrowsArgumentNullExceptionWithNullAuthorParam")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
             using var context = new GTLContext(options);
             var authorController = ControllerFactory.CreateAuthorController(context);
@@ -184,7 +185,7 @@ namespace Test
         {
             // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("InsertDoesNotInsertWithNullAuthorParam")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
 
             // action
@@ -211,7 +212,7 @@ namespace Test
             // setup
             int authorId;
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("FindByIdFindsAnExistingAuthor")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
 
             // action
@@ -230,8 +231,8 @@ namespace Test
                 var fetchedAuthor = authorController.FindByID(authorId);
 
                 Assert.That(fetchedAuthor, Has
-                    .Property("FirstName").EqualTo(authorFirstName).And
-                    .Property("LastName").EqualTo(authorLastName));
+                    .Property(nameof(Author.FirstName)).EqualTo(authorFirstName).And
+                    .Property(nameof(Author.LastName)).EqualTo(authorLastName));
             }
         }
 
@@ -240,7 +241,7 @@ namespace Test
         {
             // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("FindByIdReturnsNullOnANonExistingAuthor")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
 
             // action
@@ -258,7 +259,7 @@ namespace Test
         {
             // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("FindMaterialsFetchesMaterialsWithASingleAuthor")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .UseLazyLoadingProxies()
                 .Options;
 
@@ -296,7 +297,7 @@ namespace Test
         {
             // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("FindMaterialsFetchesMaterialsWithMultipleAuthors")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .UseLazyLoadingProxies()
                 .Options;
 
@@ -336,7 +337,7 @@ namespace Test
         {
             // setup
             var options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase("FindMaterialsDoesNotFetchAnyMaterialsWithOneAuthorAndZeroMaterials")
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .UseLazyLoadingProxies()
                 .Options;
 
