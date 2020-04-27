@@ -49,7 +49,7 @@ namespace Server.Controllers
         /// <summary>
         /// Deletes a volume entry from the database
         /// </summary>
-        /// <param name="t"></param>
+        /// <param name="volume"></param>
         /// <returns>The number of rows changed</returns>
         public int Delete(Volume volume)
         {
