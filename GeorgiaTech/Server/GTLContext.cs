@@ -471,37 +471,37 @@ namespace Server
                 entity.HasOne(member => member.CampusAddress)
                     .WithMany()
                     .HasForeignKey(member => member.CampusAddressId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK_member_campus_address_id");
 
                 entity.HasOne(member => member.HomeAddress)
                     .WithMany()
                     .HasForeignKey(member => member.HomeAddressId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK_member_home_address_id");
 
                 entity.HasMany(member => member.Memberships)
                     .WithOne(membership => membership.Member)
                     .HasForeignKey(membership => membership.MemberId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK_member_type_assignment_member_id");
 
                 entity.HasMany(member => member.Cards)
                     .WithOne(card => card.Member)
                     .HasForeignKey(card => card.MemberId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK_card_member_id");
 
                 entity.HasMany<Staff>()
                     .WithOne(staff => staff.Member)
                     .HasForeignKey(staff => staff.MemberId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK_staff_member_id");
 
                 entity.HasMany(member => member.Loans)
                     .WithOne(loan => loan.Member)
                     .HasForeignKey(loan => loan.MemberId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK_loan_member_id");
             });
 
@@ -554,13 +554,13 @@ namespace Server
                 entity.HasOne(membership => membership.Member)
                     .WithMany(member => member.Memberships)
                     .HasForeignKey(membership => membership.MemberId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK_member_type_assignment_member_id");
 
                 entity.HasOne(membership => membership.MemberType)
                     .WithMany()
                     .HasForeignKey(membership => membership.TypeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK_member_type_assignment_type_id");
             });
 
