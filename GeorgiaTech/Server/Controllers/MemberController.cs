@@ -43,7 +43,10 @@ namespace Server.Controllers
             {
                 throw new ArgumentNullException(nameof(member), "Member must have a membertype chosen");
             }
-
+            if (member.Memberships.GroupBy(x => x.MemberType).Any(g => g.Count() > 1))
+            {
+                throw new Exception("Member already has the designated membertype");
+            }
             List<Membership> memberships = new List<Membership>();
             foreach (var type in memberTypes)
             {
@@ -56,6 +59,7 @@ namespace Server.Controllers
                 };
                 memberships.Add(membership);
             }
+            
             return memberships;
         }
         public int Delete(Member t)

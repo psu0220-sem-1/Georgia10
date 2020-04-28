@@ -27,7 +27,9 @@ namespace Test
         [OneTimeSetUp]
         public void SetupOnce()
         {
-            //MemberTypes:
+            //MemberTypes: dont have a controller to go through - so direct initialization it is!
+
+            
             MemberType student = new MemberType()
             {
                 TypeName = "Student"
