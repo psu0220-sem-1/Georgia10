@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Server.Models;
 
 namespace Server.Controllers
 {
     public class MaterialController: IMaterialController
     {
-        public MaterialController()
+        private readonly GTLContext _context;
+
+        public MaterialController(GTLContext context)
         {
+            _context = context;
         }
 
         public int Delete(Material t)
@@ -22,7 +26,7 @@ namespace Server.Controllers
 
         public Material FindByID(int ID)
         {
-            throw new NotImplementedException();
+            return _context.Materials.Single(m => m.MaterialId == ID);
         }
 
         public int Insert(Material t)
