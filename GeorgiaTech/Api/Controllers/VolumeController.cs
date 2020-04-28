@@ -13,10 +13,10 @@ namespace Api.Controllers
     [Route("[controller]")]
     public class VolumeController : Controller
     {
-        private readonly Server.Controllers.VolumeController volumeController;
+        private readonly IVolumeController volumeController;
         public VolumeController(GTLContext context)
         {
-            volumeController = new Server.Controllers.VolumeController(context);
+            volumeController = ControllerFactory.CreateVolumeController(context);
         }
         // GET: /volume
         [HttpGet]
