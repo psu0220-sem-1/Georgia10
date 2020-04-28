@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Server.Controllers
 {
-    public class VolumeController: IVolumeController
+    public class VolumeController : IVolumeController
     {
         private IMaterialController materialController;
         private IAddressController addressController;
@@ -29,7 +29,7 @@ namespace Server.Controllers
         /// <returns>The created volume</returns>
         public Volume Create(int materialId, int homeLocationId, int currentLocationId)
         {
-     
+
             try
             {
                 var material = materialController.FindByID(materialId);
@@ -44,7 +44,7 @@ namespace Server.Controllers
                 throw ex;
 
             }
-        
+
         }
         /// <summary>
         /// Deletes a volume entry from the database
@@ -53,22 +53,8 @@ namespace Server.Controllers
         /// <returns>The number of rows changed</returns>
         public int Delete(Volume volume)
         {
-            using var transaction = _context.Database.BeginTransaction();
-
-            try
-            {
-                _context.Remove(volume);
-                var changedRows = _context.SaveChanges();
-                transaction.Commit();
-                return changedRows;
-
-            }
-            catch
-            {
-                transaction.Rollback();
-                throw;
-
-            }
+            _context.Remove(volume);
+            return _context.SaveChanges();
         }
 
         /// <summary>
@@ -119,7 +105,7 @@ namespace Server.Controllers
             {
                 throw ex;
             }
-          
+
         }
 
         public Volume FindByID(int ID)
@@ -145,9 +131,9 @@ namespace Server.Controllers
             {
                 throw new NullReferenceException(message: $"Volume with id: {ID} not found");
             }
-    
-        }
 
+        }
+        [Obsolete]
         public Volume FindByType(Volume t)
         {
             throw new NotImplementedException();
@@ -171,24 +157,8 @@ namespace Server.Controllers
         /// <returns>The number of rows changed</returns>
         public int Update(Volume volume)
         {
-            if (!_context.ChangeTracker.HasChanges())
-                return 0;
-
-            int changedRows;
-            using var transaction = _context.Database.BeginTransaction();
-
-            try
-            {
-                changedRows = _context.SaveChanges();
-                transaction.Commit();
-            }
-            catch (DbUpdateException)
-            {
-                transaction.Rollback();
-                throw;
-            }
-
-            return changedRows;
+            _context.Update(volume);
+            return _context.SaveChanges();
         }
     }
 }
