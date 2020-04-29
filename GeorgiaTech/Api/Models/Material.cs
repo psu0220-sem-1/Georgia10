@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Server.Models;
 
 namespace Api.Models
 {
@@ -10,7 +10,7 @@ namespace Api.Models
         public string Language { get; set; }
         public bool Lendable { get; set; }
         public string Description { get; set; }
-        public string Type { get; set; }
+        public MaterialType Type { get; set; }
         public List<Author> Authors { get; set; }
         public List<MaterialSubject> MaterialSubjects { get; set; }
     }
