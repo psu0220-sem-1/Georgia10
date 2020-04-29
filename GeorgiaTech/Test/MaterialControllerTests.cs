@@ -185,7 +185,39 @@ namespace Test
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
-            Assert.Fail();
+
+            int materialId;
+            using (var context = new GTLContext(options))
+            {
+                var material = new Material
+                {
+                    Isbn = _isbn,
+                    Title = _title,
+                    Language = _language,
+                    Lendable = _lendable,
+                    Description = _description,
+                    Type = _materialType,
+                };
+
+                context.Add(material);
+                context.SaveChanges();
+                materialId = material.MaterialId;
+            }
+
+            // action
+            using (var context = new GTLContext(options))
+            {
+                var controller = ControllerFactory.CreateMaterialController(context);
+                var material = context.Materials.Find(materialId);
+                controller.Delete(material);
+            }
+
+            // assertion
+            using (var context = new GTLContext(options))
+            {
+                var material = context.Materials.Find(materialId);
+                Assert.That(material, Is.Null);
+            }
         }
 
         [Test]
@@ -195,7 +227,51 @@ namespace Test
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
-            Assert.Fail();
+
+            int materialId;
+            var newTitle = "Some other title";
+            var newLanguage = "Danish";
+            using (var context = new GTLContext(options))
+            {
+                var material = new Material
+                {
+                    Isbn = _isbn,
+                    Title = _title,
+                    Language = _language,
+                    Lendable = _lendable,
+                    Description = _description,
+                    Type = _materialType,
+                };
+
+                context.Add(material);
+                context.SaveChanges();
+                materialId = material.MaterialId;
+            }
+
+            // action
+            using (var context = new GTLContext(options))
+            {
+                var controller = ControllerFactory.CreateMaterialController(context);
+                var material = context.Materials.Find(materialId);
+                material.Title = newTitle;
+                material.Language = newLanguage;
+
+                controller.Update(material);
+            }
+
+            // assertion
+            using (var context = new GTLContext(options))
+            {
+                var material = context.Materials.Find(materialId);
+                Assert.That(material, Has
+                    .Property(nameof(Material.Isbn)).EqualTo(_isbn).And
+                    .Property(nameof(Material.Title)).EqualTo(newTitle).And
+                    .Property(nameof(Material.Language)).EqualTo(newLanguage).And
+                    .Property(nameof(Material.Lendable)).EqualTo(_lendable).And
+                    .Property(nameof(Material.Description)).EqualTo(_description).And
+                    .Property(nameof(Material.Type))
+                );
+            }
         }
 
         [Test]
@@ -205,7 +281,31 @@ namespace Test
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
-            Assert.Fail();
+
+            using (var context = new GTLContext(options))
+            {
+                var material = new Material
+                {
+                    Isbn = _isbn,
+                    Title = _title,
+                    Description = _description,
+                    Lendable = _lendable,
+                    Language = _language,
+                    Type = _materialType,
+                };
+
+                context.Materials.Add(material);
+                context.SaveChanges();
+            }
+
+            // action
+            using (var context = new GTLContext(options))
+            {
+                var controller = ControllerFactory.CreateMaterialController(context);
+                var materialList = controller.FindAll();
+
+                Assert.That(materialList, Is.Not.Empty);
+            }
         }
 
         [Test]
@@ -215,7 +315,13 @@ namespace Test
             var options = new DbContextOptionsBuilder<GTLContext>()
                 .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
                 .Options;
-            Assert.Fail();
+
+            // don't add any materials
+            using var context = new GTLContext(options);
+            var controller = ControllerFactory.CreateMaterialController(context);
+            var materialList = controller.FindAll();
+
+            Assert.That(materialList, Is.Empty);
         }
     }
 }
