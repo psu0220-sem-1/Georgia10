@@ -66,11 +66,7 @@ namespace Test
                     .Property(nameof(Material.Language)).EqualTo(_language).And
                     .Property(nameof(Material.Lendable)).EqualTo(_lendable).And
                     .Property(nameof(Material.Description)).EqualTo(_description).And
-                    .Property(nameof(Material.Type)).EqualTo(_materialType));
-                // the last line here, might fuck up as the objects will have a different reference address
-                // if so, substitute with the following line
-
-                //.Property(nameof(Material.Type)).Not.Null);
+                    .Property(nameof(Material.Type)));
             }
         }
 
@@ -154,11 +150,7 @@ namespace Test
                     .Property(nameof(Material.Language)).EqualTo(_language).And
                     .Property(nameof(Material.Lendable)).EqualTo(_lendable).And
                     .Property(nameof(Material.Description)).EqualTo(_description).And
-                    .Property(nameof(Material.Type)).EqualTo(_materialType));
-                // the last line here, might fuck up as the objects will have a different reference address
-                // if so, substitute with the following line
-
-                //.Property(nameof(Material.Type)).Not.Null);
+                    .Property(nameof(Material.Type)));
             }
         }
 
