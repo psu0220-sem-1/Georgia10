@@ -67,21 +67,7 @@ namespace Server.Controllers
             if (!_db.ChangeTracker.HasChanges())
                 return 0;
 
-            int changedRows;
-            using var transaction = _db.Database.BeginTransaction();
-
-            try
-            {
-                changedRows = _db.SaveChanges();
-                transaction.Commit();
-            }
-            catch (DbUpdateException)
-            {
-                transaction.Rollback();
-                throw;
-            }
-
-            return changedRows;
+            return _db.SaveChanges();
         }
 
         /// <summary>
@@ -92,22 +78,8 @@ namespace Server.Controllers
         /// <remarks>NOT TESTED</remarks>
         public int Delete(Author author)
         {
-            int changedRows;
-            using var transaction = _db.Database.BeginTransaction();
-
-            try
-            {
-                _db.Remove(author);
-                changedRows = _db.SaveChanges();
-                transaction.Commit();
-            }
-            catch (DbUpdateException)
-            {
-                transaction.Rollback();
-                throw; // rethrow
-            }
-
-            return changedRows;
+            _db.Remove(author);
+            return _db.SaveChanges();
         }
 
         /// <summary>
