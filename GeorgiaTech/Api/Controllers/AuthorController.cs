@@ -25,7 +25,7 @@ namespace Api.Controllers
 
 
             var author = _controller.Create(firstName, lastName);
-            author = _controller.Insert(author);
+            _controller.Insert(author);
 
             return author;
         }

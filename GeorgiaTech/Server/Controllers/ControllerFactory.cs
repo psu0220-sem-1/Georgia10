@@ -7,7 +7,7 @@ namespace Server.Controllers
     {
         public static IAddressController CreateAddressController(GTLContext context)
         {
-            return new AddressController();
+            return new AddressController(context);
         }
         
         public static IAuthorController CreateAuthorController(GTLContext context)
@@ -29,14 +29,14 @@ namespace Server.Controllers
 
         public static IMemberController CreateMemberController(GTLContext context)
         {
-            return new MemberController();
+            return new MemberController(context);
         }
 
-        /*
+        
         public static IVolumeController CreateVolumeController(GTLContext context)
         {
-            return new VolumeController();
+            return new VolumeController(context);
         }
-        */
+        
     }
 }
