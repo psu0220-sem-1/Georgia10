@@ -11,7 +11,7 @@ using Server.Models;
 namespace Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/address")]
     public class AddressController : Controller
     {
         private readonly IAddressController addressController;
@@ -19,6 +19,7 @@ namespace Api.Controllers
         {
             addressController = ControllerFactory.CreateAddressController(context);
         }
+
         // GET: /address
         [HttpGet]
         public IActionResult GetAddresses()
@@ -39,6 +40,7 @@ namespace Api.Controllers
             return Json(address);
         }
 
+        // POST: /address
         [HttpPost]
         public IActionResult CreateAddress([FromBody] Api.Models.Address addressData)
         {
@@ -55,6 +57,7 @@ namespace Api.Controllers
             }
         }
 
+        // DELETE: /address/:id
         [HttpDelete("{id}")]
         public IActionResult DeleteAddress(int id)
         {
@@ -68,8 +71,7 @@ namespace Api.Controllers
                 return StatusCode(500);
             }
 
-            return Ok("Address deleted");
+            return Ok();
         }
-
     }
 }
