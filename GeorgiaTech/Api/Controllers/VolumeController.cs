@@ -10,7 +10,7 @@ using Server.Controllers;
 
 namespace Api.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/volume")]
     public class VolumeController : Controller
     {
         private readonly IVolumeController volumeController;
