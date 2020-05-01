@@ -69,22 +69,7 @@ namespace Server.Controllers
             if (!_db.ChangeTracker.HasChanges())
                 return 0;
 
-            int changedRows;
-            using var transaction = _db.Database.BeginTransaction();
-
-            try
-            {
-                //TODO: return changed rows once IController has been updated
-                changedRows = _db.SaveChanges();
-                transaction.Commit();
-            }
-            catch (DbUpdateException)
-            {
-                transaction.Rollback();
-                throw; // rethrow
-            }
-
-            return changedRows;
+            return _db.SaveChanges();
         }
 
         /// <summary>
@@ -97,22 +82,8 @@ namespace Server.Controllers
         /// <remarks>Not tested</remarks>
         public int Delete(Address address)
         {
-            int changedRows;
-            using var transaction = _db.Database.BeginTransaction();
-
-            try
-            {
-                _db.Remove(address);
-                changedRows = _db.SaveChanges();
-                transaction.Commit();
-            }
-            catch (DbUpdateException)
-            {
-                transaction.Rollback();
-                throw;
-            }
-
-            return changedRows;
+            _db.Remove(address);
+            return _db.SaveChanges();
         }
 
         /// <summary>

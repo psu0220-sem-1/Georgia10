@@ -9,7 +9,7 @@ namespace Server.Controllers
         {
             return new AddressController(context);
         }
-
+        
         public static IAuthorController CreateAuthorController(GTLContext context)
         {
             return new AuthorController(context);
@@ -21,10 +21,10 @@ namespace Server.Controllers
             return new LoanController();
         }
         */
-
+            
         public static IMaterialController CreateMaterialController(GTLContext context)
         {
-            return new MaterialController();
+            return new MaterialController(context);
         }
 
         public static IMemberController CreateMemberController(GTLContext context)
@@ -32,11 +32,11 @@ namespace Server.Controllers
             return new MemberController(context);
         }
 
-        /*
+        
         public static IVolumeController CreateVolumeController(GTLContext context)
         {
-            return new VolumeController();
+            return new VolumeController(context);
         }
-        */
+        
     }
 }
