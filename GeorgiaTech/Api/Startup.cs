@@ -27,6 +27,7 @@ namespace Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             services.AddDbContext<GTLContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("Default")));
             services.AddControllers();
@@ -39,6 +40,10 @@ namespace Api
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors(
+                options => options.WithOrigins("http://localhost:8080").AllowAnyMethod().AllowAnyHeader()
+            );
 
             app.UseHttpsRedirection();
 
