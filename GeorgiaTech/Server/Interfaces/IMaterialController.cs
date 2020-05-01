@@ -15,5 +15,7 @@ namespace Server.Controllers
             List<MaterialSubject> subjects,
             List<Author> authors
         );
+
+        public MaterialType FindMaterialTypeById(int id);
     }
 }

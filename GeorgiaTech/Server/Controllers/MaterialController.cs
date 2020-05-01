@@ -105,5 +105,16 @@ namespace Server.Controllers
 
             return _context.SaveChanges();
         }
+
+        /// <summary>
+        /// Finds and returns a MaterialType by its ID
+        /// </summary>
+        /// <param name="id">the ID of the materialType</param>
+        /// <returns>The material type or null if not found</returns>
+        /// <remarks>NOT TESTED</remarks>
+        public MaterialType FindMaterialTypeById(int id)
+        {
+            return _context.MaterialTypes.Find(id);
+        }
     }
 }
