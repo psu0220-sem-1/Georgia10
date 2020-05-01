@@ -261,25 +261,25 @@ namespace Test
         }
         //This will be implemented later when dummy data has been generated.
         //TODO!
-        [Test]
-        public void FindAllMembersByType()
-        {
-            MethodBase method = MethodBase.GetCurrentMethod();
-            DbContextOptions<GTLContext> options = new DbContextOptionsBuilder<GTLContext>()
-                .UseInMemoryDatabase(method.Name).EnableSensitiveDataLogging(true)
-                .Options;
-            using (var context = new GTLContext(options))
-            {
-                 IMemberController mController = ControllerFactory.CreateMemberController(context);
-                InsertDummyData(context);
-                var member = mController.Create(ssn, fName, lName, homeAddres, campusAddress, zip, homeAddressAdditionalInfo, mTypes);
-                mController.Insert(member);
+        //[Test]
+        //public void FindAllMembersByType()
+        //{
+        //    MethodBase method = MethodBase.GetCurrentMethod();
+        //    DbContextOptions<GTLContext> options = new DbContextOptionsBuilder<GTLContext>()
+        //        .UseInMemoryDatabase(method.Name).EnableSensitiveDataLogging(true)
+        //        .Options;
+        //    using (var context = new GTLContext(options))
+        //    {
+        //         IMemberController mController = ControllerFactory.CreateMemberController(context);
+        //        InsertDummyData(context);
+        //        var member = mController.Create(ssn, fName, lName, homeAddres, campusAddress, zip, homeAddressAdditionalInfo, mTypes);
+        //        mController.Insert(member);
 
 
-            }
-            throw new NotImplementedException();
+        //    }
+        //    throw new NotImplementedException();
 
-        }
+        //}
 
     }
 }
