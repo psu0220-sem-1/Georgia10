@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Server.Controllers;
 using Server;
-using Server.Models;
-// For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Api.Controllers
 {
@@ -15,6 +10,7 @@ namespace Api.Controllers
     public class AddressController : Controller
     {
         private readonly IAddressController addressController;
+
         public AddressController(GTLContext context)
         {
             addressController = ControllerFactory.CreateAddressController(context);
@@ -48,6 +44,10 @@ namespace Api.Controllers
             {
                 var address = addressController.Create(street: addressData.Street, additionalInfo: addressData.AdditionalInfo, zip: addressData.Zip);
                 var rowsChanged = addressController.Insert(address);
+
+                if (rowsChanged != 1)
+                    return StatusCode(500);
+
                 return Json(address);
 
             }
@@ -67,9 +67,7 @@ namespace Api.Controllers
 
             var rowsChanged = addressController.Delete(address);
             if (rowsChanged != 1)
-            {
                 return StatusCode(500);
-            }
 
             return Ok();
         }
