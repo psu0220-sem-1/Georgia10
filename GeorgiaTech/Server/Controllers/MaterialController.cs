@@ -116,5 +116,16 @@ namespace Server.Controllers
         {
             return _context.MaterialTypes.Find(id);
         }
+
+        /// <summary>
+        /// Finds and returns a MaterialSubject by its ID
+        /// </summary>
+        /// <param name="id">The ID of the material subject</param>
+        /// <returns>The MaterialSubject or null if not found</returns>
+        /// <remarks>NOT TESTED</remarks>
+        public MaterialSubject FindMaterialSubjectById(int id)
+        {
+            return _context.MaterialSubjects.Find(id);
+        }
     }
 }

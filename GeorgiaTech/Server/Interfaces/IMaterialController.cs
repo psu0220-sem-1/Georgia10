@@ -17,5 +17,6 @@ namespace Server.Controllers
         );
 
         public MaterialType FindMaterialTypeById(int id);
+        public MaterialSubject FindMaterialSubjectById(int id);
     }
 }
