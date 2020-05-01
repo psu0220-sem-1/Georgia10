@@ -6,6 +6,7 @@ namespace Api.Models
     public class Material
     {
         public int MaterialId { get; set; }
+        public string Title { get; set; }
         public string Isbn { get; set; }
         public string Language { get; set; }
         public bool Lendable { get; set; }
