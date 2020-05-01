@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Api.Models;
+using Castle.Core.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Server;
 using Server.Controllers;
@@ -12,9 +13,11 @@ namespace Api.Controllers
     public class MaterialController : ControllerBase
     {
         private readonly IMaterialController _controller;
+        private readonly GTLContext _context;
 
         public MaterialController(GTLContext context)
         {
+            _context = context;
             _controller = ControllerFactory.CreateMaterialController(context);
         }
 
@@ -68,9 +71,51 @@ namespace Api.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateMaterial([FromBody] Material material)
+        public IActionResult CreateMaterial([FromBody] Material materialData)
         {
-            throw new NotImplementedException();
+            // validate string data
+            if (materialData.Isbn.IsNullOrEmpty() ||
+                materialData.Title.IsNullOrEmpty() ||
+                materialData.Language.IsNullOrEmpty() ||
+                materialData.Description.IsNullOrEmpty())
+            {
+                return new BadRequestResult();
+            }
+
+            // validate MaterialType
+            var materialType = _controller.FindMaterialTypeById(materialData.Type.TypeId);
+            if (materialType == null)
+                return new BadRequestResult();
+
+            // validate Authors
+            var authorController = ControllerFactory.CreateAuthorController(_context);
+            var authors = materialData.Authors
+                .Select(author => authorController.FindByID(author.AuthorId))
+                .ToList();
+            if (authors.Any(author => author == null))
+                return new BadRequestResult();
+
+            // validate Subjects
+            var subjects = materialData.MaterialSubjects
+                .Select(subject => _controller.FindMaterialSubjectById(subject.SubjectId))
+                .ToList();
+            if (subjects.Any(subject => subject == null))
+                return new BadRequestResult();
+
+            // create & insert
+            var material = _controller.Create(
+                materialData.Isbn,
+                materialData.Title,
+                materialData.Language,
+                materialData.Lendable,
+                materialData.Description,
+                materialType,
+                subjects,
+                authors
+            );
+
+            _controller.Insert(material);
+            return new JsonResult(BuildMaterial(material));
         }
 
         [HttpPut("{id:int}")]
@@ -82,7 +127,13 @@ namespace Api.Controllers
         [HttpDelete("{id:int}")]
         public IActionResult DeleteById(int id)
         {
-            throw new NotImplementedException();
+            var material = _controller.FindByID(id);
+            if (material == null)
+                return new NotFoundResult();
+
+            var changedRows = _controller.Delete(material);
+            // TODO: Add if statement that checks for the right amount of changedRows
+            return new OkResult();
         }
     }
 }
