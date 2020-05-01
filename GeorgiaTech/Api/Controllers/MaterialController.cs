@@ -61,6 +61,9 @@ namespace Api.Controllers
         public IActionResult GetById(int id)
         {
             var material = _controller.FindByID(id);
+            if (material == null)
+                return new NotFoundResult();
+
             return new JsonResult(BuildMaterial(material));
         }
 
