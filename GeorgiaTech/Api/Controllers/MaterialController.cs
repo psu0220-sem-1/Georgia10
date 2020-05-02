@@ -1,7 +1,5 @@
-using System;
 using System.Linq;
 using Api.Models;
-using Castle.Core.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Server;
 using Server.Controllers;
@@ -13,18 +11,16 @@ namespace Api.Controllers
     public class MaterialController : ControllerBase
     {
         private readonly IMaterialController _controller;
-        private readonly GTLContext _context;
 
         public MaterialController(GTLContext context)
         {
-            _context = context;
             _controller = ControllerFactory.CreateMaterialController(context);
         }
 
-        private Api.Models.Material BuildMaterial(Server.Models.Material material)
+        private Material BuildMaterial(Server.Models.Material material)
         {
             var authors = material.MaterialAuthors
-                .Select(ma => new Api.Models.Author
+                .Select(ma => new Author
                 {
                     AuthorId = ma.Author.AuthorId,
                     FirstName = ma.Author.FirstName,
@@ -33,14 +29,14 @@ namespace Api.Controllers
                 .ToList();
 
             var subjects = material.MaterialSubjects
-                .Select(ms => new Api.Models.MaterialSubject
+                .Select(ms => new MaterialSubject
                 {
                     SubjectId = ms.MaterialSubject.SubjectId,
                     Subject = ms.MaterialSubject.SubjectName,
                 })
                 .ToList();
 
-            return new Api.Models.Material
+            return new Material
             {
                 MaterialId = material.MaterialId,
                 Isbn = material.Isbn,
