@@ -140,6 +140,81 @@ namespace Server.Controllers
             return _context.SaveChanges();
         }
 
+
+        /// <summary>
+        /// Updates a material found by id to match newMaterial. Will validate all the data passed. Expects a full
+        /// Material object to update by. Fields that are to remain the same, should still be passed holding the
+        /// original value.
+        /// </summary>
+        /// <param name="id">The ID of the material</param>
+        /// <param name="newMaterial">The new data wrapped in a Material object</param>
+        /// <returns>The number of rows that were changed</returns>
+        ///
+        /// <exception cref="ArgumentNullException">
+        /// If any of the Isbn, Title, Language or Description properties
+        /// are null or empty
+        /// </exception>
+        ///
+        /// <exception cref="ArgumentException">
+        /// If MaterialType, any of MaterialSubjects or any of MaterialAuthors can't
+        /// be found in the database
+        /// </exception>
+        ///
+        /// <remarks>NOT TESTED</remarks>
+        public int Update(int id, Material newMaterial)
+        {
+            var material = FindByID(id);
+
+            if (material == null)
+                return 0;
+
+            // validate material data
+            if (newMaterial.Isbn.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(newMaterial.Isbn), "ISBN can't be null or empty");
+            if (newMaterial.Title.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(newMaterial.Title), "Title can't be null or empty");
+            if (newMaterial.Language.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(newMaterial.Language), "Language can't be null or empty");
+            if (newMaterial.Description.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(newMaterial.Description), "Description can't be null or empty");
+
+            var materialType = _context.MaterialTypes.Find(newMaterial.Type.TypeId);
+            if (materialType == null)
+                throw new ArgumentException("MaterialType must already exist", nameof(newMaterial.Type));
+
+            material.Isbn = newMaterial.Isbn;
+            material.Title = newMaterial.Title;
+            material.Language = newMaterial.Language;
+            material.Lendable = newMaterial.Lendable;
+            material.Description = newMaterial.Description;
+            material.Type = materialType;
+
+            var materialSubjects = newMaterial.MaterialSubjects
+                .Select(ms =>
+                {
+                    var subject = _context.MaterialSubjects.Find(ms.SubjectId);
+                    if (subject == null)
+                        throw new ArgumentException("MaterialSubjects must already exist", nameof(newMaterial.MaterialSubjects));
+
+                    return new MaterialSubjects {MaterialSubject = subject, Material = material};
+                }).ToList();
+
+            var materialAuthors = newMaterial.MaterialAuthors
+                .Select(ma =>
+                {
+                    var author = _authorController.FindByID(ma.AuthorId);
+                    if (author == null)
+                        throw new ArgumentException("Authors must already exist", nameof(newMaterial.MaterialAuthors));
+
+                    return new MaterialAuthor {Author = author, Material = material};
+                }).ToList();
+
+            material.MaterialSubjects = materialSubjects;
+            material.MaterialAuthors = materialAuthors;
+
+            return _context.SaveChanges();
+        }
+
         /// <summary>
         /// Finds and returns a MaterialType by its ID
         /// </summary>

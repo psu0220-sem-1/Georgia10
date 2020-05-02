@@ -16,6 +16,7 @@ namespace Server.Controllers
             List<Author> authors
         );
 
+        public int Update(int id, Material newMaterial);
         public MaterialType FindMaterialTypeById(int id);
         public MaterialSubject FindMaterialSubjectById(int id);
     }
