@@ -73,34 +73,20 @@ namespace Api.Controllers
         [HttpPost]
         public IActionResult CreateMaterial([FromBody] Material materialData)
         {
-            // validate string data
-            if (materialData.Isbn.IsNullOrEmpty() ||
-                materialData.Title.IsNullOrEmpty() ||
-                materialData.Language.IsNullOrEmpty() ||
-                materialData.Description.IsNullOrEmpty())
-            {
-                return new BadRequestResult();
-            }
 
-            // validate MaterialType
-            var materialType = _controller.FindMaterialTypeById(materialData.Type.TypeId);
-            if (materialType == null)
-                return new BadRequestResult();
+            // build server data
+            var materialType = new
+                Server.Models.MaterialType { TypeId = materialData.Type.TypeId, Type = materialData.Type.Type };
 
-            // validate Authors
-            var authorController = ControllerFactory.CreateAuthorController(_context);
+            var materialSubjects = materialData.MaterialSubjects
+                .Select(subject => new Server.Models.MaterialSubject
+                    { SubjectId = subject.SubjectId, SubjectName = subject.Subject })
+                .ToList();
+
             var authors = materialData.Authors
-                .Select(author => authorController.FindByID(author.AuthorId))
+                .Select(author => new Server.Models.Author
+                    {FirstName = author.FirstName, LastName = author.LastName})
                 .ToList();
-            if (authors.Any(author => author == null))
-                return new BadRequestResult();
-
-            // validate Subjects
-            var subjects = materialData.MaterialSubjects
-                .Select(subject => _controller.FindMaterialSubjectById(subject.SubjectId))
-                .ToList();
-            if (subjects.Any(subject => subject == null))
-                return new BadRequestResult();
 
             // create & insert
             var material = _controller.Create(
@@ -110,7 +96,7 @@ namespace Api.Controllers
                 materialData.Lendable,
                 materialData.Description,
                 materialType,
-                subjects,
+                materialSubjects,
                 authors
             );
 
