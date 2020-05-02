@@ -73,7 +73,6 @@ namespace Api.Controllers
         [HttpPost]
         public IActionResult CreateMaterial([FromBody] Material materialData)
         {
-
             // build server data
             var materialType = new
                 Server.Models.MaterialType { TypeId = materialData.Type.TypeId, Type = materialData.Type.Type };
@@ -107,7 +106,48 @@ namespace Api.Controllers
         [HttpPut("{id:int}")]
         public IActionResult UpdateMaterial(int id, [FromBody] Material newMaterial)
         {
-            throw new NotImplementedException();
+            var material = _controller.FindByID(id);
+            if (material == null)
+                return new NotFoundResult();
+
+
+            // build server data
+            var materialType = new Server.Models.MaterialType
+                { TypeId = newMaterial.Type.TypeId, Type = newMaterial.Type.Type };
+
+            var materialSubjects = newMaterial.MaterialSubjects
+                .Select(subject => new Server.Models.MaterialSubjects
+                    {
+                        MaterialSubject = new Server.Models.MaterialSubject
+                            {SubjectName = subject.Subject, SubjectId = subject.SubjectId},
+                        Material = material
+                    })
+                .ToList();
+
+            var materialAuthors = newMaterial.Authors
+                .Select(author => new Server.Models.MaterialAuthor
+                {
+                    Material = material,
+                    Author = new Server.Models.Author
+                        {FirstName = author.FirstName, LastName = author.LastName}
+                })
+                .ToList();
+
+            var newServerMaterial = new Server.Models.Material
+            {
+                Isbn = newMaterial.Isbn,
+                Title = newMaterial.Title,
+                Language = newMaterial.Language,
+                Description = newMaterial.Description,
+                Lendable = newMaterial.Lendable,
+                Type = materialType,
+                MaterialAuthors = materialAuthors,
+                MaterialSubjects = materialSubjects,
+            };
+
+            var changedRows = _controller.Update(id, newServerMaterial);
+            material = _controller.FindByID(id);
+            return new JsonResult(BuildMaterial(material));
         }
 
         [HttpDelete("{id:int}")]
