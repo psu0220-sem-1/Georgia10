@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Castle.Core.Internal;
 using Server.Models;
 
 namespace Server.Controllers
@@ -7,10 +9,12 @@ namespace Server.Controllers
     public class MaterialController: IMaterialController
     {
         private readonly GTLContext _context;
+        private readonly IAuthorController _authorController;
 
         public MaterialController(GTLContext context)
         {
             _context = context;
+            _authorController = ControllerFactory.CreateAuthorController(context);
         }
 
         /// <summary>
@@ -27,19 +31,35 @@ namespace Server.Controllers
         /// <summary>
         /// Creates a material entity based on the parameters passed
         /// </summary>
-        /// <param name="isbn">The ISBN number of the material</param>
+        /// <param name="isbn">The ISBN of the material</param>
         /// <param name="title">The title of the material</param>
         /// <param name="language">The language the material is written in</param>
-        /// <param name="lendable">Whether the material is lendable</param>
+        /// <param name="lendable">Whether the material is lendable or not</param>
         /// <param name="description">A description of the material</param>
-        /// <param name="type">The material type</param>
+        /// <param name="type">The type of the material</param>
         /// <param name="subjects">The subjects the material covers</param>
-        /// <param name="authors">A list of authors that have written the book</param>
-        /// <returns>A material entity object</returns>
-        /// <remarks>NOT TESTED!!!</remarks>
-        public Material Create(string isbn, string title, string language, bool lendable, string description, MaterialType type,
-            List<MaterialSubject> subjects, List<Author> authors)
+        /// <param name="authors">The authors of the material</param>
+        /// <returns>A material object</returns>
+        /// <exception cref="ArgumentNullException">Thrown if one of isbn, title, language or description is empty or null</exception>
+        /// <exception cref="ArgumentException">Thrown if MaterialType, MaterialSubject or Author doesn't exist in the database</exception>
+        public Material Create(string isbn, string title, string language, bool lendable, string description,
+            MaterialType type, List<MaterialSubject> subjects, List<Author> authors)
         {
+            // validate material data
+            if (isbn.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(isbn), "ISBN can't be null or empty");
+            if (title.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(title), "Title can't be null or empty");
+            if (language.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(language), "Language can't be null or empty");
+            if (description.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(description), "Description can't be null or empty");
+
+            var materialType = _context.MaterialTypes.Find(type.TypeId);
+            if (materialType == null)
+                throw new ArgumentException("MaterialType must already exist", nameof(type));
+
+            // create material
             var material = new Material
             {
                 Isbn = isbn,
@@ -50,12 +70,26 @@ namespace Server.Controllers
                 Type = type,
             };
 
+            // validate extra data
             var materialSubjects = subjects
-                .Select(subject => new MaterialSubjects {MaterialSubject = subject, Material = material})
-                .ToList();
+                .Select(subject =>
+                {
+                    var s = _context.MaterialSubjects.Find(subject.SubjectId);
+                    if (s == null)
+                        throw new ArgumentException("All MaterialSubjects must already exist", nameof(subjects));
+
+                    return new MaterialSubjects {MaterialSubject = s, Material = material};
+                }).ToList();
+
             var materialAuthors = authors
-                .Select(author => new MaterialAuthor {Author = author, Material = material})
-                .ToList();
+                .Select(author =>
+                {
+                    var a = _authorController.FindByID(author.AuthorId);
+                    if (a == null)
+                        throw new ArgumentException("All Authors must already exist", nameof(authors));
+
+                    return new MaterialAuthor {Author = a, Material = material};
+                }).ToList();
 
             material.MaterialSubjects = materialSubjects;
             material.MaterialAuthors = materialAuthors;
