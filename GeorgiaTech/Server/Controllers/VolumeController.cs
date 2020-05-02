@@ -29,22 +29,18 @@ namespace Server.Controllers
         /// <returns>The created volume</returns>
         public Volume Create(int materialId, int homeLocationId, int currentLocationId)
         {
-
-            try
-            {
                 var material = materialController.FindByID(materialId);
                 var homeLocation = addressController.FindByID(homeLocationId);
                 var currentLocation = addressController.FindByID(currentLocationId);
 
+                if(material == null || homeLocation == null || currentLocation == null)
+                {
+                    throw new ArgumentException();
+                }
+
                 var newVolume = new Volume { Material = material, CurrentLocation = currentLocation, HomeLocation = homeLocation };
                 return newVolume;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-
-            }
-
+            
         }
         /// <summary>
         /// Deletes a volume entry from the database
