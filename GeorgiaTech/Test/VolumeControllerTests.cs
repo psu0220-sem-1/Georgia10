@@ -73,11 +73,12 @@ namespace Test
         }
 
         [Test]
-        public void CreateWithNonExistingDataThrowsInvalidOperationException()
+        public void CreateWithNonExistingDataThrowsArgumentException()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             var options = new DbContextOptionsBuilder<GTLContext>().UseInMemoryDatabase(methodName).Options;
 
+            // There is no material and address with the following IDs in the DB
             var materialId = 1;
             var homeLocationId = 1;
             var currentLocationId = 1;
@@ -86,10 +87,10 @@ namespace Test
             {
                 var volumeController = ControllerFactory.CreateVolumeController(context);
 
-                Assert.Throws<InvalidOperationException>(() => volumeController.Create(materialId, homeLocationId, currentLocationId));
-
+                // Since there is no address and material in the DB, creating a volume with those
+                // references should throw and exception
+                Assert.Throws<ArgumentException>(() => volumeController.Create(materialId, homeLocationId, currentLocationId));
             }
-
         }
 
         [Test]
@@ -118,11 +119,48 @@ namespace Test
                 var fetchedVolume = context.Volumes.Find(volumeToDelete.VolumeId);
                 var fetchedVolumes = context.Volumes.ToList();
 
-                // assert that the fetched volume is null - deleted from db
-                Assert.That(fetchedVolume, Is.Null);
-                // assert that number of volumes decreased by 1
-                Assert.AreEqual(fetchedVolumes.Count, volumes.Count - 1);
+                Assert.Multiple(() =>
+                {
+                    // assert that the fetched volume is null - deleted from db
+                    Assert.That(fetchedVolume, Is.Null);
+                    // assert that number of volumes decreased by 1
+                    Assert.AreEqual(fetchedVolumes.Count, volumes.Count - 1);
+                });
+            }
+        }
 
+        [Test]
+        public void CreateCreatesCorrectly()
+        {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            var options = new DbContextOptionsBuilder<GTLContext>().UseInMemoryDatabase(methodName).Options;
+
+            // setup
+            using (var context = new GTLContext(options))
+            {
+                var zip = new ZipCode { City = "Aalborg", Code = 9000 };
+                // zip has to be saved in db in order for the address to be created
+                context.Add(zip);
+                context.SaveChanges();
+                var homeAddress = new Address { Street = "Main road 4", AdditionalInfo = "4.floor, 10", Zip = zip };
+                var currentAddress = new Address { Street = "Library road 5", AdditionalInfo = "1.floor", Zip = zip };
+                var material = new Material { Isbn = "1234321", Title = "Mat title", Description = "A description", Language = "English", Lendable = true };
+                context.Add(homeAddress);
+                context.Add(currentAddress);
+                context.Add(material);
+                context.SaveChanges();
+
+                var volumeController = ControllerFactory.CreateVolumeController(context);
+
+                var matid = material.MaterialId;
+                var createdVolume = volumeController.Create(materialId: material.MaterialId, homeLocationId: homeAddress.AddressId, currentLocationId: currentAddress.AddressId);
+
+                Assert.Multiple(() =>
+                {
+                    Assert.AreEqual(createdVolume.Material.MaterialId, material.MaterialId);
+                    Assert.AreEqual(createdVolume.HomeLocation.AddressId, homeAddress.AddressId);
+                    Assert.AreEqual(createdVolume.CurrentLocation.AddressId, currentAddress.AddressId);
+                });
             }
         }
     }
