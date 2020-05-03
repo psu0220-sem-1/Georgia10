@@ -15,13 +15,13 @@ namespace Server.Controllers
             return new AuthorController(context);
         }
 
-        /*
+        
         public static ILoanController CreateLoanController(GTLContext context)
         {
-            return new LoanController();
+            return new LoanController(context);
         }
-        */
-            
+        
+
         public static IMaterialController CreateMaterialController(GTLContext context)
         {
             return new MaterialController(context);
