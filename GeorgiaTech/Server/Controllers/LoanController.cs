@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Server.Models;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Server.Controllers
 {
-    public class LoanController: ILoanController
+    public class LoanController : ILoanController
     {
         private readonly GTLContext _context;
 
@@ -21,12 +23,16 @@ namespace Server.Controllers
 
         public List<Loan> FindAll()
         {
-            throw new NotImplementedException();
+            return _context.Loans
+                .Include(l => l.Member)
+                .Include(l => l.Volume)
+                    .ThenInclude(v => v.Material)
+                .ToList();
         }
 
         public Loan FindByID(int ID)
         {
-            throw new NotImplementedException();
+            return _context.Loans.Find(ID);
         }
 
         public int Insert(Loan t)
@@ -38,5 +44,14 @@ namespace Server.Controllers
         {
             throw new NotImplementedException();
         }
+
+        public List<Loan> FindForMember(int memberId)
+        {
+            return _context.Loans.Where(l => l.MemberId.Equals(memberId))
+                .Include(l => l.Member)
+                .Include(l => l.Volume)
+                .ToList();
+        }
+
     }
 }
