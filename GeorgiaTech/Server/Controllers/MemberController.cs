@@ -101,6 +101,13 @@ namespace Server.Controllers
             }
             return members;
         }
+        public List<Member>FindAllByType(List<MemberType> memberTypes)
+        {
+            foreach (var type in memberTypes)
+            {
+                
+            }
+        }
 
         public int Insert(Member t)
         {

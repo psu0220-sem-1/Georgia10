@@ -11,6 +11,8 @@ namespace Server.Controllers
         public List<Membership> UpdateMembershipsOnMember(Member member,List<MemberType> memberTypes);
         public List<MemberType> GetMemberTypes();
         public List<Member> FindAllByType(Member t);
+        public List<Member> FindAllByType(List<MemberType> memberTypes);
+
         public Member FindByName(string name);
     }
 }
