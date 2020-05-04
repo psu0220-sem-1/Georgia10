@@ -40,6 +40,7 @@ namespace Api.Controllers
             {
                 MaterialId = material.MaterialId,
                 Isbn = material.Isbn,
+                Title = material.Title,
                 Language =  material.Language,
                 Description = material.Description,
                 Type = material.Type,
