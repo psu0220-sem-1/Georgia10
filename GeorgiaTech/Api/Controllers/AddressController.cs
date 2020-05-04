@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using Server.Controllers;
 using Server;
 
@@ -18,10 +20,10 @@ namespace Api.Controllers
 
         // GET: /address
         [HttpGet]
-        public IActionResult GetAddresses()
+        public IEnumerable<Api.Models.Address> GetAddresses()
         {
             var addresses = addressController.FindAll();
-            return Json(addresses);
+            return addresses.Select(a => BuildAddress(a));
         }
 
         // GET: /address/:id
@@ -33,7 +35,7 @@ namespace Api.Controllers
             {
                 return NotFound();
             }
-            return Json(address);
+            return Json(BuildAddress(address));
         }
 
         // POST: /address
@@ -48,7 +50,7 @@ namespace Api.Controllers
                 if (rowsChanged != 1)
                     return StatusCode(500);
 
-                return Json(address);
+                return Json(BuildAddress(address));
 
             }
             catch (Exception ex)
@@ -70,6 +72,18 @@ namespace Api.Controllers
                 return StatusCode(500);
 
             return Ok();
+        }
+
+        private Api.Models.Address BuildAddress(Server.Models.Address addressEntity)
+        {
+            return new Models.Address
+            {
+                AddressId = addressEntity.AddressId,
+                Street = addressEntity.Street,
+                AdditionalInfo = addressEntity.AdditionalInfo,
+                Zip = addressEntity.ZipCode,
+                City = addressEntity.Zip.City
+            };
         }
     }
 }
