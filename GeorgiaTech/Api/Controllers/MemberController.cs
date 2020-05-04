@@ -54,9 +54,9 @@ namespace Api.Controllers
             return new JsonResult(member);
         }
         //FindAll - needs to be changed
-        public IEnumerable<Member> FindAllByType(MemberType type)
+        public IEnumerable<Member> FindAllByType(List<MemberType> types)
         {
-            var members = mController.FindAllByType(type);
+            List<Member> members = mController.FindAllByType(types);
             return members;
         }
         //Update method

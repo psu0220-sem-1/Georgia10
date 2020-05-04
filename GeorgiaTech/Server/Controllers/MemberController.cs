@@ -89,24 +89,16 @@ namespace Server.Controllers
         {
             throw new NotImplementedException();
         }
-        public List<Member> FindAllByType(Member t)
+       
+        public List<Member>FindAllByType(List<MemberType> memberTypes)
         {
-
             List<Member> members = new List<Member>();
-            foreach (var type in t.Memberships)
+            foreach (var type in memberTypes)
             {
-                int typeID = type.TypeId;
-                List<Member> membersList = db.Members.Where(x => x.Memberships.Any(y => y.TypeId == typeID)).ToList();
+                List<Member> membersList = db.Members.Where(x => x.Memberships.Any(y => y.TypeId == type.TypeId)).ToList();
                 members.AddRange(membersList);
             }
             return members;
-        }
-        public List<Member>FindAllByType(List<MemberType> memberTypes)
-        {
-            foreach (var type in memberTypes)
-            {
-                
-            }
         }
 
         public int Insert(Member t)
