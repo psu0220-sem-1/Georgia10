@@ -161,8 +161,19 @@ namespace Api.Controllers
 
         // DELETE api/values/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
+            var volume = volumeController.FindByID(id);
+            if (volume == null)
+            {
+                return NotFound();
+            }
+            var rowChanged = volumeController.Delete(volume);
+            if (rowChanged != 1)
+            {
+                return StatusCode(500);
+            }
+            return Ok();
         }
     }
 }
