@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Api.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -50,11 +52,10 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public IEnumerable<Material> GetAll()
         {
             var materials = _controller.FindAll();
-
-            return new JsonResult(materials.Select(BuildMaterial).ToList());
+            return materials.Select(BuildMaterial).ToList();
         }
 
         [HttpGet("{id:int}")]
@@ -85,19 +86,26 @@ namespace Api.Controllers
                 .ToList();
 
             // create & insert
-            var material = _controller.Create(
-                materialData.Isbn,
-                materialData.Title,
-                materialData.Language,
-                materialData.Lendable,
-                materialData.Description,
-                materialType,
-                materialSubjects,
-                authors
-            );
+            try
+            {
+                var material = _controller.Create(
+                    materialData.Isbn,
+                    materialData.Title,
+                    materialData.Language,
+                    materialData.Lendable,
+                    materialData.Description,
+                    materialType,
+                    materialSubjects,
+                    authors
+                );
 
-            _controller.Insert(material);
-            return new JsonResult(BuildMaterial(material));
+                _controller.Insert(material);
+                return new JsonResult(BuildMaterial(material));
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPut("{id:int}")]
@@ -142,7 +150,16 @@ namespace Api.Controllers
                 MaterialSubjects = materialSubjects,
             };
 
-            var changedRows = _controller.Update(id, newServerMaterial);
+            try
+            {
+                var changedRows = _controller.Update(id, newServerMaterial);
+                // TODO: Add if statement that checks for the right amount of changedRows
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
+
             material = _controller.FindByID(id);
             return new JsonResult(BuildMaterial(material));
         }
