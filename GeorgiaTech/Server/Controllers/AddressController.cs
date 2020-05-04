@@ -43,7 +43,7 @@ namespace Server.Controllers
         /// <remarks>Not tested</remarks>
         public Address FindByID(int ID)
         {
-            var address = _db.Addresses.Find(ID);
+            var address = _db.Addresses.Include(a => a.Zip).SingleOrDefault(a => a.AddressId == ID);
             return address;
         }
 
@@ -54,7 +54,7 @@ namespace Server.Controllers
         /// <remarks>Not tested</remarks>
         public List<Address> FindAll()
         {
-            return _db.Addresses.ToList();
+            return _db.Addresses.Include(a => a.Zip).ToList();
         }
 
         /// <summary>
