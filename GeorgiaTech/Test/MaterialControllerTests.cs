@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
@@ -314,6 +315,202 @@ namespace Test
             var materialList = controller.FindAll();
 
             Assert.That(materialList, Is.Empty);
+        }
+
+        [Test]
+        public void CreateCreatesCorrectly()
+        {
+            // setup
+            var bookType = new MaterialType {Type = "Book"};
+            var programmingSubject = new MaterialSubject {SubjectName = "Programming"};
+            var author = new Author {FirstName = "Nikola", LastName = "Velichkov"};
+            var options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
+                .Options;
+
+            using (var context = new GTLContext(options))
+            {
+                context.Add(bookType);
+                context.Add(programmingSubject);
+                context.Add(author);
+
+                context.SaveChanges();
+            }
+
+            // action
+            using (var context = new GTLContext(options))
+            {
+                var controller = ControllerFactory.CreateMaterialController(context);
+                var material = controller.Create(
+                    _isbn,
+                    _title,
+                    _language,
+                    _lendable,
+                    _description,
+                    bookType,
+                    new List<MaterialSubject> {programmingSubject},
+                    new List<Author> {author}
+                );
+            // assertion
+
+            Assert.That(material, Has
+                .Property(nameof(Material.Isbn)).EqualTo(_isbn).And
+                .Property(nameof(Material.Title)).EqualTo(_title).And
+                .Property(nameof(Material.Language)).EqualTo(_language).And
+                .Property(nameof(Material.Lendable)).EqualTo(_lendable).And
+                .Property(nameof(Material.Description)).EqualTo(_description).And
+                .Property(nameof(Material.Type)).And
+                .Property(nameof(Material.MaterialSubjects)).And
+                .Property(nameof(Material.MaterialAuthors)));
+            }
+        }
+
+        [Test]
+        // should be more tests with the same conditions for different properties of Material
+        // (Isbn, Title, Language, Description, Lendable?)
+        public void CreateThrowsAnArgumentNullExceptionOnNullOrEmptyTitle()
+        {
+            // setup
+            var bookType = new MaterialType {Type = "Book"};
+            var programmingSubject = new MaterialSubject {SubjectName = "Programming"};
+            var author = new Author {FirstName = "Nikola", LastName = "Velichkov"};
+            var options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
+                .Options;
+
+            using (var context = new GTLContext(options))
+            {
+                context.Add(bookType);
+                context.Add(programmingSubject);
+                context.Add(author);
+
+                context.SaveChanges();
+            }
+
+            // assertion
+            using (var context = new GTLContext(options))
+            {
+                var controller = ControllerFactory.CreateMaterialController(context);
+                Assert.Throws<ArgumentNullException>(() =>
+                    controller.Create(
+                        _isbn,
+                        "",
+                        _language,
+                        _lendable,
+                        _description,
+                        bookType,
+                        new List<MaterialSubject> {programmingSubject},
+                        new List<Author> {author}
+                    ));
+            }
+        }
+
+        [Test]
+        public void CreateThrowsAnArgumentExceptionOnNonExistingMaterialType()
+        {
+            // setup
+            var bookType = new MaterialType {Type = "Book"};
+            var programmingSubject = new MaterialSubject {SubjectName = "Programming"};
+            var author = new Author {FirstName = "Nikola", LastName = "Velichkov"};
+            var options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
+                .Options;
+
+            using (var context = new GTLContext(options))
+            {
+                context.Add(programmingSubject);
+                context.Add(author);
+
+                context.SaveChanges();
+            }
+
+            using (var context = new GTLContext(options))
+            {
+                var controller = ControllerFactory.CreateMaterialController(context);
+                Assert.Throws<ArgumentException>(() =>
+                    controller.Create(
+                        _isbn,
+                        _title,
+                        _language,
+                        _lendable,
+                        _description,
+                        bookType,
+                        new List<MaterialSubject> {programmingSubject},
+                        new List<Author> {author}
+                    ));
+            }
+        }
+
+        [Test]
+        public void CreateThrowsAnArgumentExceptionOnNonExistingMaterialSubject()
+        {
+            // setup
+            var bookType = new MaterialType {Type = "Book"};
+            var programmingSubject = new MaterialSubject {SubjectName = "Programming"};
+            var author = new Author {FirstName = "Nikola", LastName = "Velichkov"};
+            var options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
+                .Options;
+
+            using (var context = new GTLContext(options))
+            {
+                context.Add(bookType);
+                context.Add(author);
+
+                context.SaveChanges();
+            }
+
+            using (var context = new GTLContext(options))
+            {
+                var controller = ControllerFactory.CreateMaterialController(context);
+                Assert.Throws<ArgumentException>(() =>
+                    controller.Create(
+                        _isbn,
+                        _title,
+                        _language,
+                        _lendable,
+                        _description,
+                        bookType,
+                        new List<MaterialSubject> {programmingSubject},
+                        new List<Author> {author}
+                    ));
+            }
+        }
+
+        [Test]
+        public void CreateThrowsAnArgumentExceptionOnNonExistingAuthor()
+        {
+            // setup
+            var bookType = new MaterialType {Type = "Book"};
+            var programmingSubject = new MaterialSubject {SubjectName = "Programming"};
+            var author = new Author {FirstName = "Nikola", LastName = "Velichkov"};
+            var options = new DbContextOptionsBuilder<GTLContext>()
+                .UseInMemoryDatabase(MethodBase.GetCurrentMethod().Name)
+                .Options;
+
+            using (var context = new GTLContext(options))
+            {
+                context.Add(bookType);
+                context.Add(programmingSubject);
+
+                context.SaveChanges();
+            }
+
+            using (var context = new GTLContext(options))
+            {
+                var controller = ControllerFactory.CreateMaterialController(context);
+                Assert.Throws<ArgumentException>(() =>
+                    controller.Create(
+                        _isbn,
+                        _title,
+                        _language,
+                        _lendable,
+                        _description,
+                        bookType,
+                        new List<MaterialSubject> {programmingSubject},
+                        new List<Author> {author}
+                    ));
+            }
         }
     }
 }
