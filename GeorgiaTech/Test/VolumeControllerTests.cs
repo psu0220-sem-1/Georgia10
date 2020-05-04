@@ -15,26 +15,35 @@ namespace Test
     {
         private List<Volume> volumes;
 
-        [SetUp]
+        [OneTimeSetUp]
         public void Setup()
         {
             volumes = new List<Volume>
             {
                 new Volume
                 {
-                    MaterialId = 1,
+                    Material = new Material {
+                    Title = "Test material 1",
+                    Isbn = "ISBN-1"
+                    },
                     CurrentLocationId = 1,
                     HomeLocationId = 2
                 },
                   new Volume
                 {
-                    MaterialId = 2,
+                    Material = new Material {
+                    Title = "Test material 2",
+                    Isbn = "ISBN-2"
+                    },
                     CurrentLocationId = 1,
                     HomeLocationId = 2
                 },
                     new Volume
                 {
-                    MaterialId = 3,
+                    Material = new Material {
+                    Title = "Test material 3",
+                    Isbn = "ISBN-3"
+                    },
                     CurrentLocationId = 1,
                     HomeLocationId = 2
                 },
