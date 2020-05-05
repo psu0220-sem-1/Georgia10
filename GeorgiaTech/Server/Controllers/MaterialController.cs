@@ -38,7 +38,12 @@ namespace Server.Controllers
         /// <param name="description">A description of the material</param>
         /// <param name="type">The type of the material</param>
         /// <param name="subjects">The subjects the material covers</param>
-        /// <param name="authors">The authors of the material</param>
+        ///
+        /// <param name="authors">
+        /// The authors of the material. If no AuthorId is supplied with any of the authors,
+        /// that author WILL be inserted into the database as a new entry, even if there already exists an author with that full name.
+        /// </param>
+        ///
         /// <returns>A material object</returns>
         /// <exception cref="ArgumentNullException">Thrown if one of isbn, title, language or description is empty or null</exception>
         /// <exception cref="ArgumentException">Thrown if MaterialType, MaterialSubject or Author doesn't exist in the database</exception>
@@ -84,11 +89,23 @@ namespace Server.Controllers
             var materialAuthors = authors
                 .Select(author =>
                 {
-                    var a = _authorController.FindByID(author.AuthorId);
-                    if (a == null)
-                        throw new ArgumentException("All Authors must already exist", nameof(authors));
+                    var fetchedAuthor = _authorController.FindByID(author.AuthorId);
 
-                    return new MaterialAuthor {Author = a, Material = material};
+                    if (fetchedAuthor == null)
+                    {
+                        if (author.FirstName.IsNullOrEmpty() || author.LastName.IsNullOrEmpty())
+                            throw new ArgumentNullException(
+                                nameof(authors),
+                                "New authors must be provided with FirstName AND LastName"
+                            );
+
+                        var newAuthor = _authorController.Create(author.FirstName, author.LastName);
+                        _authorController.Insert(newAuthor);
+
+                        return new MaterialAuthor {Author = newAuthor, Material = material};
+                    }
+
+                    return new MaterialAuthor {Author = fetchedAuthor, Material = material};
                 }).ToList();
 
             material.MaterialSubjects = materialSubjects;
