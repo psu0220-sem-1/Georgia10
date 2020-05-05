@@ -227,6 +227,15 @@ namespace Server.Controllers
         }
 
         /// <summary>
+        /// Returns an IEnumerable containing all material types saved on the database
+        /// </summary>
+        /// <returns>An IEnumerable object containing all material types</returns>
+        public IEnumerable<MaterialType> GetMaterialTypes()
+        {
+            return _context.MaterialTypes.ToList();
+        }
+
+        /// <summary>
         /// Finds and returns a MaterialSubject by its ID
         /// </summary>
         /// <param name="id">The ID of the material subject</param>
