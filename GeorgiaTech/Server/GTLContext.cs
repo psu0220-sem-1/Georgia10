@@ -442,7 +442,7 @@ namespace Server
                 entity.Property(member => member.MemberId)
                     .HasColumnName("member_id");
 
-                entity.Property(member => member.Ssn)
+                entity.Property(member => member.SSN)
                     .IsRequired()
                     .HasColumnName("ssn")
                     .HasMaxLength(10)

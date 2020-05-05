@@ -22,7 +22,7 @@ namespace Server.Controllers
         {
             Member member = new Member
             {
-                Ssn = SSN,
+                SSN = SSN,
                 FName = fName,
                 LName = lName,
                 HomeAddress = addressController.Create(homeAddress, homeAddressAdditionalInfo, zip),

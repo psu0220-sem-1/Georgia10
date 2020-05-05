@@ -13,7 +13,7 @@ namespace Server.Models
         }
 
         public int MemberId { get; set; }
-        public string Ssn { get; set; }
+        public string SSN { get; set; }
         public string FName { get; set; }
         public string LName { get; set; }
         public int HomeAddressId { get; set; }

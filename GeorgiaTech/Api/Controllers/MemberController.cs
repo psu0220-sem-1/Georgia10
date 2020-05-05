@@ -1,9 +1,10 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using Server.Models;
+using Api.Models;
 using Server.Controllers;
 using Server;
 using System.Collections.Generic;
+using System;
 
 namespace Api.Controllers
 {
@@ -12,24 +13,63 @@ namespace Api.Controllers
     public class MemberController : ControllerBase
     {
         private readonly IMemberController mController;
-
         public MemberController(GTLContext context)
         {
             mController = ControllerFactory.CreateMemberController(context);
         }
-        //Insert method.
-        public Member PostMember(string SSN, string fName, string lName, string homeAddress, string campusAddress, int zip, string homeAddressAdditionalInfo, List<MemberType> memberTypes)
-        {
 
-            var member = mController.Create(SSN, fName, lName, homeAddress, campusAddress, zip, homeAddressAdditionalInfo, memberTypes);
+        //Converter from Servermodel to APImodel. Will be used when returning a servermodel.
+
+        private Api.Models.Member BuildMember(Server.Models.Member sMember)
+        {
+            Member member = new Member()
+            {
+                SSN = sMember.SSN,
+                FName = sMember.FName,
+                LName = sMember.LName,
+                HomeAddress = sMember.HomeAddress.Street,
+                HomeAddressZip = sMember.HomeAddress.ZipCode
+            };
+            //Logic for making MemberTypes from memberShips.
+            foreach (var type in sMember.Memberships)
+            {
+                MemberType memberType = new MemberType()
+                {
+                    TypeId = type.MemberType.TypeId,
+                    TypeName = type.MemberType.TypeName
+                };
+                member.MemberTypes.Add(memberType);
+            }
             return member;
         }
-        public Member PostMember([FromBody]Member member)
+        private Server.Models.Member BuildServerMember(Member aMember)
         {
-
+            List<Server.Models.MemberType> memberTypes = new List<Server.Models.MemberType>();
+            foreach (var type in aMember.MemberTypes)
+            {
+                Server.Models.MemberType mType = new Server.Models.MemberType()
+                {
+                    TypeId = type.TypeId,
+                    TypeName = type.TypeName
+                };
+                memberTypes.Add(mType);
+            }
             
-            return member;
+            Server.Models.Member sMember = mController.Create(aMember.SSN, aMember.FName, aMember.LName, aMember.HomeAddress, aMember.CampusAddress, aMember.HomeAddressZip, aMember.HomeAddressAdditionalInfo, memberTypes);
+            return sMember;
         }
+        //Insert method.
+        public IActionResult PostMember([FromBody]Member member) 
+        {
+            //Returns an errorcode of 500 if no changes was made, to indicate a problem when 
+            int changes = mController.Insert(BuildServerMember(member)); ;
+            if (changes == 0)
+            {
+                return StatusCode(500);
+            }
+            return new JsonResult(changes);
+        }
+
         /// <summary>
         /// returns member if found on it's ID.
         /// </summary>
@@ -61,21 +101,41 @@ namespace Api.Controllers
             return new JsonResult(member);
         }
         //FindAll - needs to be changed
-        public IEnumerable<Member> FindAllByType(List<MemberType> types)
+        public IEnumerable<Member> FindAllByType([FromBody]List<MemberType> types)
         {
-            List<Member> members = mController.FindAllByType(types);
-            return members;
+            //first make list of Server Membertypes from the list of Membertypes
+            List<Server.Models.MemberType> mTypes = new List<Server.Models.MemberType>();
+            foreach (var type in types)
+            {
+                Server.Models.MemberType mType = new Server.Models.MemberType()
+                {
+                    TypeId = type.TypeId,
+                    TypeName = type.TypeName
+                };
+                mTypes.Add(mType);
+            }
+            //then get back a list of members corresponding to the types.
+            var sMembers = mController.FindAllByType(mTypes);
+
+            //convert the Server Members to the API members.
+            List<Member> aMembers = new List<Member>();
+            foreach (var member in sMembers)
+            {
+                aMembers.Add(BuildMember(member));
+            }
+            
+            return aMembers;
         }
         //Update method
         public int UpdateMember(Member member)
         {
-            return mController.Update(member);   
+            return mController.Update(BuildServerMember(member));
         }
 
         public int DeleteMember(Member member)
         {
-            return mController.Delete(member);
+            return mController.Delete(BuildServerMember(member));
         }
-        
+
     }
 }
