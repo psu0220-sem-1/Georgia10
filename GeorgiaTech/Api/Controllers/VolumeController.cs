@@ -105,7 +105,7 @@ namespace Api.Controllers
                     var materialSubjects = volume.Material.MaterialSubjects.Select(e => new Models.MaterialSubject
                     {
                         SubjectId = e.MaterialSubject.SubjectId,
-                        Subject = e.MaterialSubject.SubjectName
+                        SubjectName = e.MaterialSubject.SubjectName
                     }).ToList();
                     volumeMaterial.MaterialSubjects = materialSubjects;
                 }

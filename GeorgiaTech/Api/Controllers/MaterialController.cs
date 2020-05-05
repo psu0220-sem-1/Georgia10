@@ -34,7 +34,7 @@ namespace Api.Controllers
                 .Select(ms => new MaterialSubject
                 {
                     SubjectId = ms.MaterialSubject.SubjectId,
-                    Subject = ms.MaterialSubject.SubjectName,
+                    SubjectName = ms.MaterialSubject.SubjectName,
                 })
                 .ToList();
 
@@ -77,7 +77,7 @@ namespace Api.Controllers
 
             var materialSubjects = materialData.MaterialSubjects
                 .Select(subject => new Server.Models.MaterialSubject
-                    { SubjectId = subject.SubjectId, SubjectName = subject.Subject })
+                    { SubjectId = subject.SubjectId, SubjectName = subject.SubjectName })
                 .ToList();
 
             var authors = materialData.Authors
@@ -124,7 +124,7 @@ namespace Api.Controllers
                 .Select(subject => new Server.Models.MaterialSubjects
                     {
                         MaterialSubject = new Server.Models.MaterialSubject
-                            {SubjectName = subject.Subject, SubjectId = subject.SubjectId},
+                            {SubjectName = subject.SubjectName, SubjectId = subject.SubjectId},
                         Material = material
                     })
                 .ToList();
