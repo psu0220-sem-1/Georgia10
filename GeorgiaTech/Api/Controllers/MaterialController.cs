@@ -82,7 +82,7 @@ namespace Api.Controllers
 
             var authors = materialData.Authors
                 .Select(author => new Server.Models.Author
-                    {FirstName = author.FirstName, LastName = author.LastName})
+                    {AuthorId = author.AuthorId, FirstName = author.FirstName, LastName = author.LastName})
                 .ToList();
 
             // create & insert

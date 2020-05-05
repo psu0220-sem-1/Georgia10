@@ -67,7 +67,7 @@ namespace Server.Controllers
                 Language = language,
                 Lendable = lendable,
                 Description = description,
-                Type = type,
+                Type = materialType,
             };
 
             // validate extra data
