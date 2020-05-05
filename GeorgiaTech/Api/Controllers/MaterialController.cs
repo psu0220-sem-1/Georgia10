@@ -177,5 +177,18 @@ namespace Api.Controllers
             // TODO: Add if statement that checks for the right amount of changedRows
             return new OkResult();
         }
+
+        /// <summary>
+        /// Returns all available material types to the client
+        /// </summary>
+        /// <returns>An IEnumerable with all available material types</returns>
+        [HttpGet("materialtypes")]
+        public IEnumerable<MaterialType> GetMaterialTypes()
+        {
+            return _controller
+                .GetMaterialTypes()
+                .Select(mt => new MaterialType {TypeId = mt.TypeId, Type = mt.Type})
+                .ToList();
+        }
     }
 }
