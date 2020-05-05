@@ -20,7 +20,14 @@ namespace Api.Controllers
         //Insert method.
         public Member PostMember(string SSN, string fName, string lName, string homeAddress, string campusAddress, int zip, string homeAddressAdditionalInfo, List<MemberType> memberTypes)
         {
+
             var member = mController.Create(SSN, fName, lName, homeAddress, campusAddress, zip, homeAddressAdditionalInfo, memberTypes);
+            return member;
+        }
+        public Member PostMember([FromBody]Member member)
+        {
+
+            
             return member;
         }
         /// <summary>
@@ -29,7 +36,7 @@ namespace Api.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
 
-            //Find method
+        //Find method
         public IActionResult GetMemberByID(int id)
         {
             var member = mController.FindByID(id);
