@@ -38,6 +38,8 @@ namespace Api.Controllers
                 })
                 .ToList();
 
+            var materialType = new MaterialType {TypeId = material.Type.TypeId, Type = material.Type.Type};
+
             return new Material
             {
                 MaterialId = material.MaterialId,
@@ -45,7 +47,7 @@ namespace Api.Controllers
                 Title = material.Title,
                 Language =  material.Language,
                 Description = material.Description,
-                Type = material.Type,
+                Type = materialType,
                 Authors = authors,
                 MaterialSubjects = subjects,
             };
