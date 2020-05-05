@@ -236,5 +236,14 @@ namespace Server.Controllers
         {
             return _context.MaterialSubjects.Find(id);
         }
+
+        /// <summary>
+        /// Returns an IEnumerable object containing all MaterialSubject entities saved on the database
+        /// </summary>
+        /// <returns>An IEnumerable object containing all MaterialSubject entities on the database</returns>
+        public IEnumerable<MaterialSubject> GetMaterialSubjects()
+        {
+            return _context.MaterialSubjects.ToList();
+        }
     }
 }

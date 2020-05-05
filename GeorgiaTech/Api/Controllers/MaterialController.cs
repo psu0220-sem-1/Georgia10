@@ -175,5 +175,15 @@ namespace Api.Controllers
             // TODO: Add if statement that checks for the right amount of changedRows
             return new OkResult();
         }
+
+        [HttpGet("materialsubjects")]
+        public IEnumerable<MaterialSubject> GetMaterialSubjects()
+        {
+            return _controller
+                .GetMaterialSubjects()
+                .Select(subject => new MaterialSubject
+                    {SubjectId = subject.SubjectId, SubjectName = subject.SubjectName})
+                .ToList();
+        }
     }
 }
