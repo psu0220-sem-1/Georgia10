@@ -219,15 +219,31 @@ namespace Server.Controllers
             var materialAuthors = newMaterial.MaterialAuthors
                 .Select(ma =>
                 {
-                    var author = _authorController.FindByID(ma.AuthorId);
-                    if (author == null)
-                        throw new ArgumentException("Authors must already exist", nameof(newMaterial.MaterialAuthors));
+                    var author = ma.Author;
+                    var fetchedAuthor = _authorController.FindByID(author.AuthorId);
+                    if (fetchedAuthor == null)
+                    {
+                        if (author.FirstName.IsNullOrEmpty() || author.LastName.IsNullOrEmpty())
+                            throw new ArgumentNullException(
+                                nameof(newMaterial.MaterialAuthors),
+                                "New authors must be provided with FirstName AND LastName"
+                            );
 
-                    return new MaterialAuthor {Author = author, Material = material};
+                        var newAuthor = _authorController.Create(author.FirstName, author.LastName);
+                        _authorController.Insert(newAuthor);
+
+                        return new MaterialAuthor {Author = newAuthor, Material = material};
+                    }
+
+                    return new MaterialAuthor {Author = fetchedAuthor, Material = material};
                 }).ToList();
 
             material.MaterialSubjects = materialSubjects;
+
+            // remove pre-existing authors
+            _context.RemoveRange(material.MaterialAuthors);
             material.MaterialAuthors = materialAuthors;
+
 
             return _context.SaveChanges();
         }
