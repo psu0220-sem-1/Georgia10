@@ -20,7 +20,7 @@ namespace Api.Controllers
 
         //Converter from Servermodel to APImodel. Will be used when returning a servermodel.
 
-        private Api.Models.Member BuildMember(Server.Models.Member sMember)
+        private Api.Models.Member Build_API_Member(Server.Models.Member sMember)
         {
             Member member = new Member()
             {
@@ -121,7 +121,7 @@ namespace Api.Controllers
             List<Member> aMembers = new List<Member>();
             foreach (var member in sMembers)
             {
-                aMembers.Add(BuildMember(member));
+                aMembers.Add(Build_API_Member(member));
             }
             
             return aMembers;
@@ -135,6 +135,15 @@ namespace Api.Controllers
         public int DeleteMember(Member member)
         {
             return mController.Delete(BuildServerMember(member));
+        }
+        public List<Member> GetMembers()
+        {
+            List<Member> members = new List<Member>();
+            foreach (var member in mController.FindAll())
+            {
+                members.Add(Build_API_Member(member));
+            }
+            return members;
         }
 
     }
