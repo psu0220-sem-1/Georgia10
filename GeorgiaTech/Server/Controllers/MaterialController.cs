@@ -209,11 +209,12 @@ namespace Server.Controllers
             var materialSubjects = newMaterial.MaterialSubjects
                 .Select(ms =>
                 {
-                    var subject = _context.MaterialSubjects.Find(ms.SubjectId);
-                    if (subject == null)
+                    var subject = ms.MaterialSubject;
+                    var fetchedSubject = _context.MaterialSubjects.Find(subject.SubjectId);
+                    if (fetchedSubject == null)
                         throw new ArgumentException("MaterialSubjects must already exist", nameof(newMaterial.MaterialSubjects));
 
-                    return new MaterialSubjects {MaterialSubject = subject, Material = material};
+                    return new MaterialSubjects {MaterialSubject = fetchedSubject, Material = material};
                 }).ToList();
 
             var materialAuthors = newMaterial.MaterialAuthors
@@ -238,6 +239,8 @@ namespace Server.Controllers
                     return new MaterialAuthor {Author = fetchedAuthor, Material = material};
                 }).ToList();
 
+            // remove previous material subjects
+            _context.RemoveRange(material.MaterialSubjects);
             material.MaterialSubjects = materialSubjects;
 
             // remove pre-existing authors
