@@ -134,7 +134,7 @@ namespace Api.Controllers
                 {
                     Material = material,
                     Author = new Server.Models.Author
-                        {FirstName = author.FirstName, LastName = author.LastName}
+                        {AuthorId = author.AuthorId, FirstName = author.FirstName, LastName = author.LastName}
                 })
                 .ToList();
 
