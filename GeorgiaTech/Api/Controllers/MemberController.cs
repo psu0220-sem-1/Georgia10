@@ -58,7 +58,10 @@ namespace Api.Controllers
             Server.Models.Member sMember = mController.Create(aMember.SSN, aMember.FName, aMember.LName, aMember.HomeAddress, aMember.CampusAddress, aMember.HomeAddressZip, aMember.HomeAddressAdditionalInfo, memberTypes);
             return sMember;
         }
-        //Insert method.
+
+
+        //Frontending API methods. Should be called with /api/{methodname}?[var]=[value]
+        [HttpPost]
         public IActionResult PostMember([FromBody]Member member) 
         {
             //Returns an errorcode of 500 if no changes was made, to indicate a problem when 
@@ -77,6 +80,7 @@ namespace Api.Controllers
         /// <returns></returns>
 
         //Find method
+        [HttpGet("id:int")]
         public IActionResult GetMemberByID(int id)
         {
             var member = mController.FindByID(id);
@@ -91,6 +95,8 @@ namespace Api.Controllers
         /// </summary>
         /// <param name="name">name of searched member</param>
         /// <returns></returns>
+        ///
+        [HttpGet("name:string")]
         public IActionResult GetMemberByName(string name)
         {
             var member = mController.FindByName(name);
@@ -101,41 +107,19 @@ namespace Api.Controllers
             return new JsonResult(member);
         }
         //FindAll - needs to be changed
-        public IEnumerable<Member> FindAllByType([FromBody]List<MemberType> types)
-        {
-            //first make list of Server Membertypes from the list of Membertypes
-            List<Server.Models.MemberType> mTypes = new List<Server.Models.MemberType>();
-            foreach (var type in types)
-            {
-                Server.Models.MemberType mType = new Server.Models.MemberType()
-                {
-                    TypeId = type.TypeId,
-                    TypeName = type.TypeName
-                };
-                mTypes.Add(mType);
-            }
-            //then get back a list of members corresponding to the types.
-            var sMembers = mController.FindAllByType(mTypes);
-
-            //convert the Server Members to the API members.
-            List<Member> aMembers = new List<Member>();
-            foreach (var member in sMembers)
-            {
-                aMembers.Add(Build_API_Member(member));
-            }
-            
-            return aMembers;
-        }
+       
         //Update method
+        [HttpPut]
         public int UpdateMember(Member member)
         {
             return mController.Update(BuildServerMember(member));
         }
-
+        [HttpDelete]
         public int DeleteMember(Member member)
         {
             return mController.Delete(BuildServerMember(member));
         }
+        [HttpGet]
         public List<Member> GetMembers()
         {
             List<Member> members = new List<Member>();
