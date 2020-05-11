@@ -22,7 +22,7 @@ namespace Server.Controllers
         {
             Member member = new Member
             {
-                Ssn = SSN,
+                SSN = SSN,
                 FName = fName,
                 LName = lName,
                 HomeAddress = addressController.Create(homeAddress, homeAddressAdditionalInfo, zip),
@@ -43,7 +43,10 @@ namespace Server.Controllers
             {
                 throw new ArgumentNullException(nameof(member), "Member must have a membertype chosen");
             }
-
+            if (member.Memberships.GroupBy(x => x.MemberType).Any(g => g.Count() > 1))
+            {
+                throw new Exception("Member already has the designated membertype");
+            }
             List<Membership> memberships = new List<Membership>();
             foreach (var type in memberTypes)
             {
@@ -56,6 +59,7 @@ namespace Server.Controllers
                 };
                 memberships.Add(membership);
             }
+            
             return memberships;
         }
         public int Delete(Member t)
@@ -85,14 +89,13 @@ namespace Server.Controllers
         {
             throw new NotImplementedException();
         }
-        public List<Member> FindAllByType(Member t)
+       
+        public List<Member>FindAllByType(List<MemberType> memberTypes)
         {
-
             List<Member> members = new List<Member>();
-            foreach (var type in t.Memberships)
+            foreach (var type in memberTypes)
             {
-                int typeID = type.TypeId;
-                List<Member> membersList = db.Members.Where(x => x.Memberships.Any(y => y.TypeId == typeID)).ToList();
+                List<Member> membersList = db.Members.Where(x => x.Memberships.Any(y => y.TypeId == type.TypeId)).ToList();
                 members.AddRange(membersList);
             }
             return members;

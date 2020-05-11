@@ -29,7 +29,9 @@ namespace Api
         {
             services.AddCors();
             services.AddDbContext<GTLContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("Default")));
+                options
+                    .UseSqlServer(Configuration.GetConnectionString("Default"))
+                    .UseLazyLoadingProxies());
             services.AddControllers();
         }
 
