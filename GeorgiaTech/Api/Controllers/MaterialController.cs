@@ -38,6 +38,8 @@ namespace Api.Controllers
                 })
                 .ToList();
 
+            var materialType = new MaterialType {TypeId = material.Type.TypeId, Type = material.Type.Type};
+
             return new Material
             {
                 MaterialId = material.MaterialId,
@@ -45,7 +47,7 @@ namespace Api.Controllers
                 Title = material.Title,
                 Language =  material.Language,
                 Description = material.Description,
-                Type = material.Type,
+                Type = materialType,
                 Authors = authors,
                 MaterialSubjects = subjects,
             };
@@ -183,6 +185,19 @@ namespace Api.Controllers
                 .GetMaterialSubjects()
                 .Select(subject => new MaterialSubject
                     {SubjectId = subject.SubjectId, SubjectName = subject.SubjectName})
+                .ToList();
+        }
+
+        /// <summary>
+        /// Returns all available material types to the client
+        /// </summary>
+        /// <returns>An IEnumerable with all available material types</returns>
+        [HttpGet("materialtypes")]
+        public IEnumerable<MaterialType> GetMaterialTypes()
+        {
+            return _controller
+                .GetMaterialTypes()
+                .Select(mt => new MaterialType {TypeId = mt.TypeId, Type = mt.Type})
                 .ToList();
         }
     }

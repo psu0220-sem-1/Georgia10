@@ -18,6 +18,7 @@ namespace Server.Controllers
 
         public int Update(int id, Material newMaterial);
         public MaterialType FindMaterialTypeById(int id);
+        public IEnumerable<MaterialType> GetMaterialTypes();
         public MaterialSubject FindMaterialSubjectById(int id);
         public IEnumerable<MaterialSubject> GetMaterialSubjects();
     }
