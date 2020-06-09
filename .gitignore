@@ -354,3 +354,5 @@ MigrationBackup/
 
 # ignore appsettings
 appsettings.json
+
+new.sql
